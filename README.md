@@ -1,3 +1,4 @@
+# Team Repository: Audrey Kelly, Anoushka Sunkum, Anushka Angamuthu, and Lara Erdmann
 ## Pre-requisites
   * [Git](https://git-scm.com/)
 
