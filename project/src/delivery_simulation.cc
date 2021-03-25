@@ -40,23 +40,23 @@ void DeliverySimulation::ScheduleDelivery(IEntity* package, IEntity* dest) {
 	// Cast pointers of each entity type
 	Package* pack = dynamic_cast<Package*>(package);
 	Customer* customer = dynamic_cast<Customer*>(dest);
-	Drone* drone = nullptr;
+	PackageCarrier* carrier = nullptr;
 
 	int size = GetEntities().size();
 	for (int i = 0; i < size; i++) {
 		EntityBase* entity = dynamic_cast<EntityBase*>(GetEntities().at(i));
 		// Entity should not already be involved in a delivery (IsDynamic() should be false)
 		if (entity && !(entity->IsDynamic()) && entity->GetType().compare("drone") == 0)  {
-			drone = dynamic_cast<Drone*>(GetEntities().at(i));
+			carrier = dynamic_cast<PackageCarrier*>(GetEntities().at(i));
 			// Only schedule delivery if all casted pointers are valid
-			if (drone && pack && customer) {
-				scheduler->ScheduleDelivery(pack, drone, customer);
+			if (carrier && pack && customer) {
+				scheduler->ScheduleDelivery(pack, carrier, customer);
 				return;
 			}
 		}
 	}
-	if (!drone) {
-		std::cout << "Delivery failed; no drones available" << std::endl;
+	if (!carrier) {
+		std::cout << "Delivery failed; no drones or robots available" << std::endl;
 	}
 }
 
