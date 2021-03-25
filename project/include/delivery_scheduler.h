@@ -33,21 +33,21 @@ class DeliveryScheduler {
      * @details 
      * 
      * @param[in] package: the Package entity to be delivered
-     * @param[in] carrier: Drone entity to complete delivery
+     * @param[in] carrier: Drone or Robot entity to complete delivery
      * @param[in] dest: the Customer entity receiving the package
      */
-    void ScheduleDelivery(Package* package, Drone* carrier, Customer* customer);
+    void ScheduleDelivery(Package* package, PackageCarrier* carrier, Customer* customer);
     /**
-     * @brief Create the path along a smart route from the drone to package to customer. 
+     * @brief Create the path along a smart route from the drone/robot to package to customer. 
      *
      * @see IGraph class for GetPath() method
      * 
-     * @param[in] dronePosition in float vector with coordinate points
+     * @param[in] carrierPosition in float vector with coordinate points
      * @param[in] packagePosition in float vector with coordinate points
      * @param[in] customerPosition in float vector with coordinate points
      * @return List of vector coordinate points for path from drone to customer
      */
-    std::vector< std::vector<float> > CreatePath(std::vector<float> dronePosition,
+    std::vector< std::vector<float> > CreatePath(std::vector<float> carrierPosition,
                                                 std::vector<float> packagePosition, std::vector<float> customerPosition);
  private:
     const IGraph* graph_;

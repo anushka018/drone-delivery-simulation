@@ -9,7 +9,7 @@ namespace csci3081 {
         graph_ = graph;
     }
 
-    void DeliveryScheduler::ScheduleDelivery(Package* package, Drone* carrier, Customer* customer) {
+    void DeliveryScheduler::ScheduleDelivery(Package* package, PackageCarrier* carrier, Customer* customer) {
         std::vector<float> customerLocation = customer->GetPosition();
 	    package->SetDestination(customerLocation);
 	    package->SetCustomer(customer);
@@ -18,16 +18,16 @@ namespace csci3081 {
 		    return;
 	    }
         // Create path from drone to package to customer
-        std::vector< std::vector<float> > dronePath = CreatePath(carrier->GetPosition(), package->GetPosition(), customerLocation);
-		carrier->SetPath(dronePath);
+        std::vector< std::vector<float> > carrierPath = CreatePath(carrier->GetPosition(), package->GetPosition(), customerLocation);
+		carrier->SetPath(carrierPath);
 		carrier->AssignPackage(package);
         return;
     }
 
-    std::vector< std::vector<float> > DeliveryScheduler::CreatePath(std::vector<float> dronePosition, 
+    std::vector< std::vector<float> > DeliveryScheduler::CreatePath(std::vector<float> carrierPosition, 
 																std::vector<float> packagePosition, std::vector<float> customerPosition) {
         std::vector< std::vector<float> > path;
-	    path = graph_->GetPath(dronePosition, packagePosition);
+	    path = graph_->GetPath(carrierPosition, packagePosition);
         // remove duplicate package position in middle of path
         path.pop_back();
 	    std::vector< std::vector<float> > pathToCustomer = graph_->GetPath(packagePosition, customerPosition);
