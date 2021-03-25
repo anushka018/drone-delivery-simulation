@@ -9,6 +9,7 @@ namespace csci3081 {
         // initialize factories to an empty vector
         factories = {};
         factories.push_back(new DroneFactory());
+        factories.push_back(new RobotFactory());
 	    factories.push_back(new CustomerFactory());
 	    factories.push_back(new PackageFactory());
     }

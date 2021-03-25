@@ -46,7 +46,7 @@ void DeliverySimulation::ScheduleDelivery(IEntity* package, IEntity* dest) {
 	for (int i = 0; i < size; i++) {
 		EntityBase* entity = dynamic_cast<EntityBase*>(GetEntities().at(i));
 		// Entity should not already be involved in a delivery (IsDynamic() should be false)
-		if (entity && !(entity->IsDynamic()) && entity->GetType().compare("drone") == 0)  {
+		if (entity && !(entity->IsDynamic()))  {
 			carrier = dynamic_cast<PackageCarrier*>(GetEntities().at(i));
 			// Only schedule delivery if all casted pointers are valid
 			if (carrier && pack && customer) {
