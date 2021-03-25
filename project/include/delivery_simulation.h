@@ -8,8 +8,14 @@
  * Includes
  ******************************************************************************/
 #include <EntityProject/facade/delivery_system.h>
-#include <vector>
-#include <string>
+#include "composite_factory.h"
+#include "entity_base.h"
+#include "json_helper.h"
+#include "composite_factory.h"
+#include "drone_factory.h"
+#include "package_factory.h"
+#include "customer_factory.h"
+#include "delivery_scheduler.h"
 
 namespace csci3081 {
 
@@ -75,7 +81,6 @@ class DeliverySimulation : public IDeliverySystem {
   be used to get a path from one position to another.
   */
   void SetGraph(const IGraph* graph);
-
   /**
   This function tells the simulation that the IEntity* package should be delivered
   to the IEntity* dest (which is likely a customer). How the delivery takes place
@@ -122,6 +127,9 @@ class DeliverySimulation : public IDeliverySystem {
   // the most straightforward way of storing the entities in the system.
   // Feel free to use it as is or change it.
   std::vector<IEntity*> entities_;
+  CompositeFactory* entityFactory;
+  DeliveryScheduler* scheduler;
+  const IGraph* map;
 };
 
 }  // namespace csci3081
