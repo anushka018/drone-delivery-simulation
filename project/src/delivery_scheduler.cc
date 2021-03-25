@@ -17,7 +17,7 @@ namespace csci3081 {
         if (package->GetDestination().GetDistance(Vector3D(package->GetPosition())) <= package->GetRadius()) {
 		    return;
 	    }
-        // Create path from drone to package to customer
+        // Create path from drone/robot to package to customer
         std::vector< std::vector<float> > carrierPath = CreatePath(carrier->GetPosition(), package->GetPosition(), customerLocation);
 		carrier->SetPath(carrierPath);
 		carrier->AssignPackage(package);

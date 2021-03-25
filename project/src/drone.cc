@@ -4,8 +4,6 @@
  */
 #include "drone.h"
 #include <iterator>
-#include "battery.h"
-#include "package.h"
 
 namespace csci3081 {
 

@@ -1,14 +1,14 @@
 /**
- * @file drone_factory.cc
+ * @file robot_factory.cc
  * @author Audrey Kelly
  */
-#include "drone_factory.h"
+#include "robot_factory.h"
 
 namespace csci3081 {
-    DroneFactory::DroneFactory() {};
+    RobotFactory::RobotFactory() {};
 
-    IEntity* DroneFactory::CreateEntity(const picojson::object& val) {
-        if (JsonHelper::GetString(val, "type").compare("drone") == 0) {
+    IEntity* RobotFactory::CreateEntity(const picojson::object& val) {
+        if (JsonHelper::GetString(val, "type").compare("robot") == 0) {
             bool contains = false;
             std::vector<float> position = JsonHelper::GetStdFloatVector(val, "position");
             std::vector<float> direction = JsonHelper::GetStdFloatVector(val, "direction");
@@ -33,7 +33,8 @@ namespace csci3081 {
             if (contains) {
                 batteryCapacity = (float) JsonHelper::GetDouble(val, "battery_capacity");
             }
-            return new Drone(position, direction, val, name, speed, radius, batteryCapacity);
+            
+            return new Robot(position, direction, val, name, speed, radius, batteryCapacity);
         }
         return nullptr;
     }
