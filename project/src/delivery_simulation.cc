@@ -1,36 +1,64 @@
+/**
+ * @file delivery_factory.cc
+ */
 #include "delivery_simulation.h"
-#include "entity_base.h"
-#include "json_helper.h"
-#include "drone.h"
 
 namespace csci3081 {
 
-DeliverySimulation::DeliverySimulation() {}
+DeliverySimulation::DeliverySimulation() {
+	entityFactory = new CompositeFactory();
+}
 
-DeliverySimulation::~DeliverySimulation() {}
+DeliverySimulation::~DeliverySimulation() {
+	for (IEntity* entity : entities_) {
+		delete entity;
+	}
+	delete entityFactory;
+	delete map;
+	delete scheduler;
+}
 
 IEntity* DeliverySimulation::CreateEntity(const picojson::object& val) {
-  //TODO for lab10: replace the ?????'s with the appropriate values,
-  //  then uncomment the section of code
-  /*
-  if (JsonHelper::GetString(val, "????") == "drone") {
-    std::vector<float> position = JsonHelper::GetStdFloatVector(val, "????????");
-    std::vector<float> direction = JsonHelper::GetStdFloatVector(val, "????????");
-    return new Drone(????, ????, ????);
-  }
-  */
-  return NULL;
+	// Call composite factory to create entity
+   return entityFactory->CreateEntity(val); 
 }
 
-void DeliverySimulation::AddFactory(IEntityFactory* factory) {}
+void DeliverySimulation::AddFactory(IEntityFactory* factory) {
+	entityFactory->AddFactory(factory); 
+}
 
 void DeliverySimulation::AddEntity(IEntity* entity) { 
-  //TODO for lab10: One line of code
+  entities_.push_back(entity); // Add to vector of entitites for simulation
 }
 
-void DeliverySimulation::SetGraph(const IGraph* graph) {}
+void DeliverySimulation::SetGraph(const IGraph* graph) {
+	scheduler = new DeliveryScheduler(graph);
+	map = graph;
+}
 
-void DeliverySimulation::ScheduleDelivery(IEntity* package, IEntity* dest) {}
+void DeliverySimulation::ScheduleDelivery(IEntity* package, IEntity* dest) {
+	// Cast pointers of each entity type
+	Package* pack = dynamic_cast<Package*>(package);
+	Customer* customer = dynamic_cast<Customer*>(dest);
+	PackageCarrier* carrier = nullptr;
+
+	int size = GetEntities().size();
+	for (int i = 0; i < size; i++) {
+		EntityBase* entity = dynamic_cast<EntityBase*>(GetEntities().at(i));
+		// Entity should not already be involved in a delivery (IsDynamic() should be false)
+		if (entity && !(entity->IsDynamic()))  {
+			carrier = dynamic_cast<PackageCarrier*>(GetEntities().at(i));
+			// Only schedule delivery if all casted pointers are valid
+			if (carrier && pack && customer) {
+				scheduler->ScheduleDelivery(pack, carrier, customer);
+				return;
+			}
+		}
+	}
+	if (!carrier) {
+		std::cout << "Delivery failed; no drones or robots available" << std::endl;
+	}
+}
 
 void DeliverySimulation::AddObserver(IEntityObserver* observer) {}
 
@@ -38,7 +66,15 @@ void DeliverySimulation::RemoveObserver(IEntityObserver* observer) {}
 
 const std::vector<IEntity*>& DeliverySimulation::GetEntities() const { return entities_; }
 
-void DeliverySimulation::Update(float dt) {}
+void DeliverySimulation::Update(float dt) {
+	int size = GetEntities().size();
+	for (int i = 0; i < size; i++) {
+		EntityBase* entity = dynamic_cast<EntityBase*> (GetEntities().at(i));
+		if (entity->IsDynamic()) {
+			entity->Update(dt);
+		}
+	}
+}
 
 
 // DO NOT MODIFY THE FOLLOWING UNLESS YOU REALLY KNOW WHAT YOU ARE DOING
@@ -90,4 +126,4 @@ void DeliverySimulation::RunScript(const picojson::array& script, IEntitySystem*
 	}
 }
 
-}
+}	// namespace csci3081
