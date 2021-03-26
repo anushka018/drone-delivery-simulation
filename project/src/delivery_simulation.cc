@@ -60,9 +60,13 @@ void DeliverySimulation::ScheduleDelivery(IEntity* package, IEntity* dest) {
 	}
 }
 
-void DeliverySimulation::AddObserver(IEntityObserver* observer) {}
+void DeliverySimulation::AddObserver(IEntityObserver* observer) {
+	observers.push_back(observer);
+}
 
-void DeliverySimulation::RemoveObserver(IEntityObserver* observer) {}
+void DeliverySimulation::RemoveObserver(IEntityObserver* observer) {
+	observers.erase(std::remove(observers.begin(), observers.end(), observer), observers.end()); 
+}
 
 const std::vector<IEntity*>& DeliverySimulation::GetEntities() const { return entities_; }
 
