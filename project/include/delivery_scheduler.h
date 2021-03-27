@@ -36,7 +36,25 @@ class DeliveryScheduler {
      * @param[in] carrier: Drone or Robot entity to complete delivery
      * @param[in] dest: the Customer entity receiving the package
      */
-    void ScheduleDelivery(Package* package, PackageCarrier* carrier, Customer* customer);
+    void ScheduleDelivery(Package* package, std::vector<PackageCarrier*> carriers, Customer* customer);
+    /**
+     * @brief Find the closest Drone or Robot to the package for schedule delivery method
+     * 
+     * @param[in] packagePosition: Vector3D to represent the package's coordinates in simulation
+     * @param[in] carriers: list of available Drones and Robots not currently delivering packages
+     * @return PackageCarrier*: the drone or robot available for the delivery
+     */
+    PackageCarrier* FindClosestCarrier(const Vector3D packagePosition, std::vector<PackageCarrier*> carriers);
+    /**
+     * @brief Assign a currently busy drone or robot to deliver another package in the future
+     * 
+     * @details Extends the package carrier's path from its current customer to the new package and then its assigned customer
+     * 
+     * @param[in] PackageCarrier* carrier for the package
+     * @param[in] Customer* customer receiving package
+     * @param[in] Package* package for delivery
+     */
+    void StackDeliveries(PackageCarrier* carrier, Customer* customer, Package* package);
     /**
      * @brief Create the path along a smart route from the drone/robot to package to customer. 
      *

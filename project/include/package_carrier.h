@@ -71,7 +71,8 @@ class PackageCarrier : public EntityBase {
 
  private:
     Battery* battery;
-    Package* package_;
+    Package* currentPackage;
+    std::vector<Package*> packages;
     std::vector< std::vector<float> > path;
     int pathIndex;
     bool hasPackage;

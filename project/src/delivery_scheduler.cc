@@ -9,7 +9,7 @@ namespace csci3081 {
         graph_ = graph;
     }
 
-    void DeliveryScheduler::ScheduleDelivery(Package* package, PackageCarrier* carrier, Customer* customer) {
+    void DeliveryScheduler::ScheduleDelivery(Package* package, std::vector<PackageCarrier*> carriers, Customer* customer) {
         std::vector<float> customerLocation = customer->GetPosition();
 	    package->SetDestination(customerLocation);
 	    package->SetCustomer(customer);
@@ -17,11 +17,37 @@ namespace csci3081 {
         if (package->GetDestination().GetDistance(Vector3D(package->GetPosition())) <= package->GetRadius()) {
 		    return;
 	    }
-        // Create path from drone/robot to package to customer
-        std::vector< std::vector<float> > carrierPath = CreatePath(carrier->GetPosition(), package->GetPosition(), customerLocation);
-		carrier->SetPath(carrierPath);
-		carrier->AssignPackage(package);
+        
+        PackageCarrier* carrier = FindClosestCarrier(Vector3D(package->GetPosition()), carriers);
+        if (carrier) {
+            // Create path from drone/robot to package to customer
+            std::vector< std::vector<float> > carrierPath = CreatePath(carrier->GetPosition(), package->GetPosition(), customerLocation);
+		    carrier->SetPath(carrierPath);
+		    carrier->AssignPackage(package);
+        }
+        else {
+            // randomly assign to another drone/robot currently delivering a package
+            int randomIndex = rand() % carriers.size(); 
+            carrier = carriers.at(randomIndex);
+            StackDeliveries(carrier, customer, package);
+        }
         return;
+    }
+
+    PackageCarrier* DeliveryScheduler::FindClosestCarrier(const Vector3D packagePosition, std::vector<PackageCarrier*> carriers) {
+        float minDistance = 1000000;
+        float distanceToPackage = 0;
+        Vector3D carrierPosition;
+        PackageCarrier* closestCarrier = nullptr;
+        for (PackageCarrier* carrier : carriers) {
+            carrierPosition = Vector3D(carrier->GetPosition());
+            distanceToPackage = carrierPosition.GetDistance(packagePosition);
+            if (distanceToPackage < minDistance && !(carrier->IsDynamic())) {
+                minDistance = distanceToPackage;
+                closestCarrier = carrier;
+            }
+        }
+        return closestCarrier;
     }
 
     std::vector< std::vector<float> > DeliveryScheduler::CreatePath(std::vector<float> carrierPosition, 
@@ -35,5 +61,15 @@ namespace csci3081 {
 	    path.insert(path.end(), pathToCustomer.begin(), pathToCustomer.end());
         return path;
     }
+    void DeliveryScheduler::StackDeliveries(PackageCarrier* carrier, Customer* customer, Package* package) {
+        std::vector< std::vector<float> > currentPath = carrier->GetPath();
+        std::vector< std::vector<float> > extendedPath = CreatePath(currentPath.back(),
+                                                                    package->GetPosition(), customer->GetPosition());
+        currentPath.insert(currentPath.end(), extendedPath.begin(), extendedPath.end());
+        carrier->SetPath(currentPath);
+        carrier->AssignPackage(package);
+        return;
+    }
+
 }   //  end namespace csci3081
 
