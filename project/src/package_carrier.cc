@@ -14,7 +14,7 @@ PackageCarrier::PackageCarrier(std::vector<float> position, std::vector<float> d
   battery = new Battery(batteryCapacity);
   pathIndex = 0;
   hasPackage = false;
-  package_ = nullptr;
+  currentPackage = nullptr;
   path = {};
 }
 
@@ -25,7 +25,7 @@ void PackageCarrier::Update(float dt) {
     position_ += Vector3D((direction_ * speed_) * dt);
     posVector = position_.GetVector();
     // If PackageCarrier is carrying package or is within package's radius, it updates the package's position to match its own
-    if (hasPackage || position_.GetDistance(Vector3D(package_->GetPosition())) <= (package_->GetRadius() + radius_)) {
+    if (hasPackage || position_.GetDistance(Vector3D(currentPackage->GetPosition())) <= (currentPackage->GetRadius() + radius_)) {
       hasPackage = true;
       CarryPackage();
     }
@@ -34,13 +34,19 @@ void PackageCarrier::Update(float dt) {
 }
 
 void PackageCarrier::CarryPackage() {
-    package_->SetSpeed(speed_);
-    package_->SetPosition(posVector);
-    package_->SetDirection(dirVector);
+    currentPackage->SetSpeed(speed_);
+    currentPackage->SetPosition(posVector);
+    currentPackage->SetDirection(dirVector);
     // If package position has reached its destination, PackageCarrier should deliver package and stop moving
-    if (position_.GetDistance(package_->GetDestination()) <= package_->GetRadius()) {
-      package_->SetPosition({0,-500,0});
+    if (position_.GetDistance(currentPackage->GetDestination()) <= currentPackage->GetRadius()) {
+      currentPackage->SetPosition({0,-500,0});
       hasPackage = false;
+      // Remove package from list of scheduled deliveries
+      packages.erase(packages.begin());
+      // Continue to next package to deliver if there are more scheduled
+      if (packages.size() > 0) {
+        currentPackage = packages.at(0);
+      }
     }
 }
 
@@ -63,7 +69,8 @@ void PackageCarrier::SetDirection(const std::vector<float>& dest) {
 
 void PackageCarrier::AssignPackage(Package* package) {
   isDynamic = true;
-  package_ = package;
+  packages.push_back(package);
+  currentPackage = packages.at(0);
 }
 
 std::vector< std::vector<float> > PackageCarrier::GetPath() {
