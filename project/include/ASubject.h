@@ -1,24 +1,27 @@
 #include "EntityProject/entity.h"
 
+
+namespace csci3081{
 class ASubject { // declaration / definition
 private:
-	std::vector<ConcreteObserver*> list; // list of pointers to Customer observers
+	std::vector<IEntityObserver*> observers; // list of pointers to Customer observers
 public:
-	void Attach(ConcreteObserver* observer);
-	void Detach(ConcreteObserver* observer);
+	void Attach(IEntityObserver* observer);
+	void Detach(IEntityObserver* observer);
 	void Notify(const picojson::value& event, const IEntity& entity);
 };
 
-void ASubject::Attach(Customer* observer) { // implementation
-	list.push_back(observer);
+void ASubject::Attach(IEntityObserver* observer) { // implementation
+	observers.push_back(observer);
 }
-void ASubject::Detach(Customer* observer) { // implemenatation
-	list.erase(std::remove(list.begin(), list.end(), observer), list.end());
+void ASubject::Detach(IEntityObserver* observer) { // implemenatation
+	observers.erase(std::remove(observers.begin(), observers.end(), observer), observers.end());
 }
 
 void ASubject::Notify(const picojson::value& event, const IEntity& entity) { // implementation
-	for (ConcreteObserver * concreteObserver : list){
+	for (IEntityObserver * concreteObserver : observers){
 		if (concreteObserver != NULL)
 			concreteObserver ->OnEvent(event, entity);
 	}
+}
 }

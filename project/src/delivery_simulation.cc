@@ -77,6 +77,9 @@ void DeliverySimulation::Update(float dt) {
 		if (entity->IsDynamic()) {
 			entity->Update(dt);
 		}
+		//check to see if package
+		//run if statements to see if it is in new section of delivery
+		//send update of status to GetStatus() with new event and entity
 	}
 }
 

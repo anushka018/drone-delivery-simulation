@@ -28,6 +28,7 @@ void PackageCarrier::Update(float dt) {
     if (hasPackage || position_.GetDistance(Vector3D(package_->GetPosition())) <= (package_->GetRadius() + radius_)) {
       hasPackage = true;
       CarryPackage();
+      //change json object values to en route
     }
     battery->DecreaseCharge(dt);
   }
@@ -42,6 +43,7 @@ void PackageCarrier::CarryPackage() {
       package_->SetPosition({0,-500,0});
       hasPackage = false;
     }
+    //change json object values to delivered
 }
 
 void PackageCarrier::SetDirection(const std::vector<float>& dest) {
@@ -64,6 +66,7 @@ void PackageCarrier::SetDirection(const std::vector<float>& dest) {
 void PackageCarrier::AssignPackage(Package* package) {
   isDynamic = true;
   package_ = package;
+  //change json object values to scheduled
 }
 
 std::vector< std::vector<float> > PackageCarrier::GetPath() {
