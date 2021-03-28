@@ -1,7 +1,10 @@
 # Team Repository: Audrey Kelly, Anoushka Sunkum, Anushka Angamuthu, and Lara Erdmann
 kell2416
+
 sunku005
+
 angam003
+
 erdma252
 
 ## Pre-requisites
