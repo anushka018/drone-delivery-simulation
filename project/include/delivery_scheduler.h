@@ -68,7 +68,15 @@ class DeliveryScheduler {
     std::vector< std::vector<float> > CreatePath(std::vector<float> carrierPosition,
                                                 std::vector<float> packagePosition, std::vector<float> customerPosition);
  private:
+   /**
+    * @brief Reference to IGraph for creating smart routes on the proper web scene
+    * 
+    */
     const IGraph* graph_;
+    /**
+     * @brief This integer index is used for even delivery distribution between the carriers if there are multiple deliveries
+     */
+    int nextCarrier;
 };
 
 } //    namespace csci3081

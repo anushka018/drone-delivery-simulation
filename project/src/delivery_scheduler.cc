@@ -7,6 +7,7 @@
 namespace csci3081 {
     DeliveryScheduler::DeliveryScheduler(const IGraph* graph) {
         graph_ = graph;
+        nextCarrier = 0;
     }
 
     void DeliveryScheduler::ScheduleDelivery(Package* package, std::vector<PackageCarrier*> carriers, Customer* customer) {
@@ -26,9 +27,9 @@ namespace csci3081 {
 		    carrier->AssignPackage(package);
         }
         else {
-            // randomly assign to another drone/robot currently delivering a package
-            int randomIndex = rand() % carriers.size(); 
-            carrier = carriers.at(randomIndex);
+            // If there are no available drones/robots, then the delivery is stacked to the last carrier to be scheduled
+            nextCarrier = nextCarrier % carriers.size();
+            carrier = carriers.at(nextCarrier++);
             StackDeliveries(carrier, customer, package);
         }
         return;
