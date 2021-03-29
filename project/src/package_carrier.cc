@@ -4,6 +4,7 @@
  */
 #include "package_carrier.h"
 #include <iterator>
+#include <json_helper.h>
 
 namespace csci3081 {
 
@@ -16,6 +17,8 @@ PackageCarrier::PackageCarrier(std::vector<float> position, std::vector<float> d
   hasPackage = false;
   package_ = nullptr;
   path = {};
+  event = JsonHelper::CreateJsonNotification();
+
 }
 
 void PackageCarrier::Update(float dt) {
@@ -29,6 +32,11 @@ void PackageCarrier::Update(float dt) {
       hasPackage = true;
       CarryPackage();
       //change json object values to en route
+      event = JsonHelper::CreateJsonNotification();
+      JsonHelper::AddStringToJsonObject(event, "value", "en route");
+      JsonHelper::ConvertPicojsonObjectToValue(event);
+
+
     }
     battery->DecreaseCharge(dt);
   }
@@ -44,6 +52,10 @@ void PackageCarrier::CarryPackage() {
       hasPackage = false;
     }
     //change json object values to delivered
+    event = JsonHelper::CreateJsonNotification();
+    JsonHelper::AddStringToJsonObject(event, "value", "delivered");
+    JsonHelper::ConvertPicojsonObjectToValue(event);
+
 }
 
 void PackageCarrier::SetDirection(const std::vector<float>& dest) {
@@ -67,6 +79,10 @@ void PackageCarrier::AssignPackage(Package* package) {
   isDynamic = true;
   package_ = package;
   //change json object values to scheduled
+  event = JsonHelper::CreateJsonNotification();
+  JsonHelper::AddStringToJsonObject(event, "value", "scheduled");
+  JsonHelper::ConvertPicojsonObjectToValue(event);
+
 }
 
 std::vector< std::vector<float> > PackageCarrier::GetPath() {

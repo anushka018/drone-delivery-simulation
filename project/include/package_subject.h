@@ -1,22 +1,11 @@
 #include <ASubject.h>
 
-class Package : public ASubject { //Concrete Subject - Car
-private: 
-    bool scheduled_;
-	bool pickedUp_;
-    bool delivered_;
+class PackageSubject : public ASubject { //Concrete Subject - Package 
 public:
-	Package(bool scheduled, bool pickedUp, bool delivered) { 
-        scheduled_ = scheduled; 
-        pickedUp_ = pickedUp; 
-        delivered_ = delivered;
-    }
-	void ChangeStatus(bool scheduled, bool pickedUp, bool delivered);
+	PackageSubject() { };
+	void ChangeStatus(const picojson::value& event,const IEntity& entity);
 };
 
-void Package::ChangeStatus(bool scheduled, bool pickedUp, bool delivered) { // implementation
-    scheduled_ = scheduled; 
-    pickedUp_ = pickedUp; 
-    delivered_ = delivered;
-	On_Event(const picojson::value& event, const IEntity& entity);
+void PackageSubject::ChangeStatus(const picojson::value& event,const IEntity& entity) { // implementation
+	Notify(const picojson::value& event, const IEntity& entity);
 }

@@ -76,6 +76,7 @@ class PackageCarrier : public EntityBase {
     int pathIndex;
     bool hasPackage;
     //json object for event 
+    picojson::object event;
 
     /**
      * @brief Pick up and move the package along with the carrier.  
