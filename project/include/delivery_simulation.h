@@ -126,7 +126,7 @@ class DeliverySimulation : public IDeliverySystem {
   // You don't strictly need to use the following variable, but it is probably
   // the most straightforward way of storing the entities in the system.
   // Feel free to use it as is or change it.
-  std::vector<IEntity*> entities_;
+   std::vector<IEntity*> entities_;
   CompositeFactory* entityFactory;
   std::vector<IEntityObserver*> observers;
   DeliveryScheduler* scheduler;

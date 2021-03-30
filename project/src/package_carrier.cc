@@ -4,6 +4,7 @@
  */
 #include "package_carrier.h"
 #include <iterator>
+#include <algorithm>
 #include <json_helper.h>
 
 namespace csci3081 {
@@ -19,7 +20,14 @@ PackageCarrier::PackageCarrier(std::vector<float> position, std::vector<float> d
   path = {};
 }
 
+
 void PackageCarrier::Update(float dt) {
+  // find segment of path from package to customer
+  std::vector< std::vector<float> >::iterator it = std::find(path.begin(), path.end(), currentPackage->GetPosition());
+  int index = std::distance(path.begin(), it);
+  std::vector< std::vector<float> > customerPath(path.size() - index);
+  std::copy(path.begin() + index, path.end(), customerPath.begin());
+
   // PackageCarrier cannot move without battery power
   if (!(battery->IsDead())) {
     SetDirection(path[pathIndex]);
@@ -29,16 +37,15 @@ void PackageCarrier::Update(float dt) {
     if (hasPackage) {
       CarryPackage();
     }
-    if (!hasPackage && position_.GetDistance(Vector3D(package_->GetPosition())) <= (package_->GetRadius() + radius_)) {
+    if (!hasPackage && position_.GetDistance(Vector3D(currentPackage->GetPosition())) <= (currentPackage->GetRadius() + radius_)) {
       hasPackage = true;
       CarryPackage();
       //notify the observers that the package is on its way
-      picojson::object eventObj = JsonHelper::CreateJsonNotification();
-      JsonHelper::AddStringToJsonObject(eventObj, "value", "en route");
-      picojson::value eventVal = JsonHelper::ConvertPicojsonObjectToValue(eventObj);
-      Notify(eventVal, *package_);
-
-
+      picojson::value eventVal = CreateNotification("en route");
+      Notify(eventVal, *currentPackage);
+      // notify the observers that the drone is now moving to the customer
+      eventVal = CreateNotification("moving", customerPath);
+      Notify(eventVal, *this);
     }
     battery->DecreaseCharge(dt);
   }
@@ -54,18 +61,19 @@ void PackageCarrier::CarryPackage() {
       hasPackage = false;
       // Remove package from list of scheduled deliveries
       packages.erase(packages.begin());
+      // Notify observers that package has been delivered
+      picojson::value eventVal = CreateNotification("delivered");
+      Notify(eventVal, *currentPackage);
       // Continue to next package to deliver if there are more scheduled
       if (packages.size() > 0) {
         currentPackage = packages.at(0);
       }
-      //notify the observers that the package has been delivered
-      picojson::object eventObj = JsonHelper::CreateJsonNotification();
-      JsonHelper::AddStringToJsonObject(eventObj, "value", "delivered");
-      picojson::value eventVal = JsonHelper::ConvertPicojsonObjectToValue(eventObj);
-      Notify(eventVal, *package_);
-
-    }
-    
+      else {
+        // Notify observers that drone has stopped moving
+      eventVal = CreateNotification("idle");
+      Notify(eventVal, *this);
+      }
+    }  
 }
 
 void PackageCarrier::SetDirection(const std::vector<float>& dest) {
@@ -78,7 +86,6 @@ void PackageCarrier::SetDirection(const std::vector<float>& dest) {
       else { // path index out of bounds, PackageCarrier should stop moving
         speed_ = 0.0;
       }
-
     }
     direction_ = convertDest - position_;
     direction_.Normalize();
@@ -89,13 +96,27 @@ void PackageCarrier::AssignPackage(Package* package) {
   isDynamic = true;
   packages.push_back(package);
   currentPackage = packages.at(0);
-  package_ = package;
-  //notify the observers that the package has been scheduled
-  picojson::object eventObj = JsonHelper::CreateJsonNotification();
-  JsonHelper::AddStringToJsonObject(eventObj, "value", "scheduled");
-  picojson::value eventVal = JsonHelper::ConvertPicojsonObjectToValue(eventObj);
-  Notify(eventVal, *package_);
+  // notify the observers that the package has been scheduled
+  picojson::value eventVal = CreateNotification("scheduled");
+  Notify(eventVal, *currentPackage);
+  // find segment of path from carrier origin to package
+  std::vector< std::vector<float> >::iterator it = std::find(path.begin(), path.end(), currentPackage->GetPosition());
+  int index = std::distance(path.begin(), it);
+  std::vector< std::vector<float> > packagePath(index + 1);
+  std::copy(path.begin(), path.begin() + index + 1, packagePath.begin());
+  // notify observers that package carrier is moving toward package
+  eventVal = CreateNotification("moving", packagePath);
+  Notify(eventVal, *this);
+}
 
+picojson::value PackageCarrier::CreateNotification(std::string event, const std::vector< std::vector<float> >& path) {
+  picojson::object eventObj = JsonHelper::CreateJsonNotification();
+  JsonHelper::AddStringToJsonObject(eventObj, "value", event);
+  picojson::value eventVal = JsonHelper::ConvertPicojsonObjectToValue(eventObj);
+  if (path.size() > 0) {
+    JsonHelper::AddStdVectorVectorFloatToJsonObject(eventObj, "path", path);
+  }
+  return JsonHelper::ConvertPicojsonObjectToValue(eventObj);
 }
 
 std::vector< std::vector<float> > PackageCarrier::GetPath() {
