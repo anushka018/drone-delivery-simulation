@@ -76,6 +76,7 @@ class PackageCarrier : public EntityBase {
     std::vector< std::vector<float> > path;
     int pathIndex;
     bool hasPackage;
+    //json object for event 
 
     /**
      * @brief Pick up and move the package along with the carrier.  

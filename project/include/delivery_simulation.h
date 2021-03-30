@@ -128,6 +128,7 @@ class DeliverySimulation : public IDeliverySystem {
   // Feel free to use it as is or change it.
   std::vector<IEntity*> entities_;
   CompositeFactory* entityFactory;
+  std::vector<IEntityObserver*> observers;
   DeliveryScheduler* scheduler;
   const IGraph* map;
 };
