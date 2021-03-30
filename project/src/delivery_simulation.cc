@@ -29,6 +29,15 @@ void DeliverySimulation::AddFactory(IEntityFactory* factory) {
 
 void DeliverySimulation::AddEntity(IEntity* entity) { 
   entities_.push_back(entity); // Add to vector of entitites for simulation
+  for (int i = 0; i < observers.size(); i++)
+  {
+	EntityBase* entityBase = dynamic_cast<EntityBase*>(entity);
+	if(entityBase) {
+		entityBase->Attach(observers.at(i));
+	}
+
+  }
+  
 }
 
 void DeliverySimulation::SetGraph(const IGraph* graph) {
@@ -65,6 +74,14 @@ void DeliverySimulation::AddObserver(IEntityObserver* observer) {
 }
 
 void DeliverySimulation::RemoveObserver(IEntityObserver* observer) {
+	for (int i = 0; i < entities_.size(); i++)
+	{
+		EntityBase* entityBase = dynamic_cast<EntityBase*>(entities_.at(i));
+		if(entityBase) {
+			entityBase->Detach(observer);
+		}
+	}
+	
 	observers.erase(std::remove(observers.begin(), observers.end(), observer), observers.end()); 
 }
 

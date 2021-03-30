@@ -26,7 +26,10 @@ void PackageCarrier::Update(float dt) {
     position_ += Vector3D((direction_ * speed_) * dt);
     posVector = position_.GetVector();
     // If PackageCarrier is carrying package or is within package's radius, it updates the package's position to match its own
-    if (hasPackage || position_.GetDistance(Vector3D(package_->GetPosition())) <= (package_->GetRadius() + radius_)) {
+    if (hasPackage) {
+      CarryPackage();
+    }
+    if (!hasPackage && position_.GetDistance(Vector3D(package_->GetPosition())) <= (package_->GetRadius() + radius_)) {
       hasPackage = true;
       CarryPackage();
       //notify the observers that the package is on its way
@@ -49,13 +52,14 @@ void PackageCarrier::CarryPackage() {
     if (position_.GetDistance(package_->GetDestination()) <= package_->GetRadius()) {
       package_->SetPosition({0,-500,0});
       hasPackage = false;
-    }
-    //notify the observers that the package has been delivered
-    picojson::object eventObj = JsonHelper::CreateJsonNotification();
-    JsonHelper::AddStringToJsonObject(eventObj, "value", "delivered");
-    picojson::value eventVal = JsonHelper::ConvertPicojsonObjectToValue(eventObj);
-    Notify(eventVal, *package_);
+      //notify the observers that the package has been delivered
+      picojson::object eventObj = JsonHelper::CreateJsonNotification();
+      JsonHelper::AddStringToJsonObject(eventObj, "value", "delivered");
+      picojson::value eventVal = JsonHelper::ConvertPicojsonObjectToValue(eventObj);
+      Notify(eventVal, *package_);
 
+    }
+    
 }
 
 void PackageCarrier::SetDirection(const std::vector<float>& dest) {
