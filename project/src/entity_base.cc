@@ -14,9 +14,7 @@ namespace csci3081 {
         details_ = details;                    
         posVector = position;
         dirVector = direction;
-        this->position_ = Vector3D(position);
-        this->direction_ = Vector3D(direction);
-
+    
         version = 0;
         ID = ++entityCount;
         name_ = name;

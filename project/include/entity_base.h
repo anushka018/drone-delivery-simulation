@@ -11,6 +11,7 @@
 #include <vector>
 #include <string>
 #include "vector3D.h"
+#include "vector2D.h"
 #include "ASubject.h"
 
 namespace csci3081 {
