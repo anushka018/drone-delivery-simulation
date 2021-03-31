@@ -11,6 +11,11 @@
 #include <vector>
 #include <string>
 #include "vector3D.h"
+<<<<<<< HEAD
+#include "ASubject.h"
+=======
+#include "Asubject.h"
+>>>>>>> feature/12-implement-observer-pattern-for-drone/robot
 
 namespace csci3081 {
 
@@ -26,7 +31,7 @@ namespace csci3081 {
  *
  * See the documentation for IEntity for more information
  */
-class EntityBase : public IEntity {
+class EntityBase : public IEntity, public ASubject {
  public:
     /**
      * @brief Construct a new Entity Base object

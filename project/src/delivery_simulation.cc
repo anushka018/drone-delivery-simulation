@@ -29,6 +29,15 @@ void DeliverySimulation::AddFactory(IEntityFactory* factory) {
 
 void DeliverySimulation::AddEntity(IEntity* entity) { 
   entities_.push_back(entity); // Add to vector of entitites for simulation
+  for (int i = 0; i < observers.size(); i++)
+  {
+	EntityBase* entityBase = dynamic_cast<EntityBase*>(entity);
+	if(entityBase) {
+		entityBase->Attach(observers.at(i));
+	}
+
+  }
+  
 }
 
 void DeliverySimulation::SetGraph(const IGraph* graph) {
@@ -40,29 +49,47 @@ void DeliverySimulation::ScheduleDelivery(IEntity* package, IEntity* dest) {
 	// Cast pointers of each entity type
 	Package* pack = dynamic_cast<Package*>(package);
 	Customer* customer = dynamic_cast<Customer*>(dest);
+	std::vector<PackageCarrier*> possibleCarriers;
 	PackageCarrier* carrier = nullptr;
+
 
 	int size = GetEntities().size();
 	for (int i = 0; i < size; i++) {
 		EntityBase* entity = dynamic_cast<EntityBase*>(GetEntities().at(i));
 		// Entity should not already be involved in a delivery (IsDynamic() should be false)
-		if (entity && !(entity->IsDynamic()))  {
+		if (entity)  {
 			carrier = dynamic_cast<PackageCarrier*>(GetEntities().at(i));
 			// Only schedule delivery if all casted pointers are valid
 			if (carrier && pack && customer) {
-				scheduler->ScheduleDelivery(pack, carrier, customer);
-				return;
+				possibleCarriers.push_back(carrier);
 			}
 		}
 	}
-	if (!carrier) {
-		std::cout << "Delivery failed; no drones or robots available" << std::endl;
+	if (possibleCarriers.size() > 0) {
+		scheduler->ScheduleDelivery(pack, possibleCarriers, customer);
+		return;
 	}
+	else {
+		std::cout << "Delivery Failed; there are no drones or robots in simulation" << std::endl;
+	}
+	
 }
 
-void DeliverySimulation::AddObserver(IEntityObserver* observer) {}
+void DeliverySimulation::AddObserver(IEntityObserver* observer) {
+	observers.push_back(observer);
+}
 
-void DeliverySimulation::RemoveObserver(IEntityObserver* observer) {}
+void DeliverySimulation::RemoveObserver(IEntityObserver* observer) {
+	for (int i = 0; i < entities_.size(); i++)
+	{
+		EntityBase* entityBase = dynamic_cast<EntityBase*>(entities_.at(i));
+		if(entityBase) {
+			entityBase->Detach(observer);
+		}
+	}
+	
+	observers.erase(std::remove(observers.begin(), observers.end(), observer), observers.end()); 
+}
 
 const std::vector<IEntity*>& DeliverySimulation::GetEntities() const { return entities_; }
 
@@ -73,6 +100,10 @@ void DeliverySimulation::Update(float dt) {
 		if (entity->IsDynamic()) {
 			entity->Update(dt);
 		}
+		
+		//check to see if package
+		//run if statements to see if it is in new section of delivery
+		//send update of status to GetStatus() with new event and entity
 	}
 }
 

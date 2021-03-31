@@ -64,6 +64,15 @@ class PackageCarrier : public EntityBase {
      */
     Battery* GetBattery();
     /**
+     * @brief Creates a picojson object of type notification, loads the correct values for that type of notification, 
+     * and converts the picojson object into a picojson value
+     * 
+     * @param[in] event: string for picojson object key "value"
+     * @param[in] path: optional parameter for drone/robot notifications
+     * @return picojson::value with loaded values for observer notification
+     */
+    picojson::value CreateNotification(std::string event, const std::vector< std::vector<float> >& path = {});
+    /**
      * @brief Destroy the carrier object and its dynamically allocated battery
      * 
      */
@@ -71,10 +80,12 @@ class PackageCarrier : public EntityBase {
 
  private:
     Battery* battery;
-    Package* package_;
+    Package* currentPackage;
+    std::vector<Package*> packages;
     std::vector< std::vector<float> > path;
     int pathIndex;
     bool hasPackage;
+    //json object for event 
 
     /**
      * @brief Pick up and move the package along with the carrier.  
