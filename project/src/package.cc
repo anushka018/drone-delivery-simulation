@@ -9,9 +9,7 @@ namespace csci3081 {
                         const picojson::object& details, const std::string name,
                             float weight, float speed, float radius) 
                     : EntityBase(details, position, direction, name, speed, radius) {
-
-  position_ = Vector3D(position);
-  direction_ = Vector3D(direction);                                     
+                                        
   type_ = "package";
   weight_ = weight;
   destination = Vector3D(); // Initialized to origin of graph until delivery is scheduled
