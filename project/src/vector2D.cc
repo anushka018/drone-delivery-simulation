@@ -5,13 +5,13 @@
 #include "vector2D.h"
 
 namespace csci3081 {
-    Vector2D::Vector2D(float newX, float newZ) : Vector3D(newX, 0.0, newZ) {};
+    Vector2D::Vector2D(float newX, float newZ) : Vector3D(newX, 264, newZ) {};
 
     Vector2D::Vector2D(std::vector<float> vec) {
         if (vec.size() >= 3) {
             x = vec.at(0);
-            y = 0.0;
-            z = vec.at(1);
+            y = 264;
+            z = vec.at(2);
         }
         else {
             x = 0.0;
