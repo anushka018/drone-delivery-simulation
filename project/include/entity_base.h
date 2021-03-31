@@ -11,11 +11,7 @@
 #include <vector>
 #include <string>
 #include "vector3D.h"
-<<<<<<< HEAD
 #include "ASubject.h"
-=======
-#include "Asubject.h"
->>>>>>> feature/12-implement-observer-pattern-for-drone/robot
 
 namespace csci3081 {
 
