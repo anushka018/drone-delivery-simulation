@@ -197,13 +197,15 @@ namespace csci3081 {
             EXPECT_FLOAT_EQ(drone.GetPosition().at(i), newPos.at(i));
         }
     }
-
+    
     // Update Test Part 1: Check how drone movement affects position and direction
     // as it moves along the given path
     TEST_F(DroneTest, UpdatePositionTest) {
         Drone drone = Drone(position, direction, droneObj);
+        drone.SetPath(path);
         Package* package = new Package(position, direction, packageObj);
         drone.AssignPackage(package);
+
         ASSERT_EQ(position.size(), drone.GetPosition().size());
         for (int i = 0; i < position.size(); i++) {
             EXPECT_EQ(drone.GetPosition().at(i), position.at(i));
@@ -272,7 +274,6 @@ namespace csci3081 {
         EXPECT_FLOAT_EQ(newPos.at(0), 9.1);
         EXPECT_FLOAT_EQ(newPos.at(1), 0);
         EXPECT_FLOAT_EQ(newPos.at(2), 0);
-
         // Drone is now near the first point in path, should switch direction
         dt = 0.10;
         drone.Update(dt);
@@ -304,7 +305,7 @@ namespace csci3081 {
         EXPECT_NEAR(drone.GetDirection().at(0), -0.041, 0.001);
         EXPECT_NEAR(drone.GetDirection().at(1), 0.717, 0.001);
         EXPECT_NEAR(drone.GetDirection().at(2), 0.696, 0.001);
-
+        
         // Reach point 2
         drone.Update(dt);
         drone.Update(dt);
@@ -380,17 +381,18 @@ namespace csci3081 {
         EXPECT_NEAR(newPos.at(0), 0, 0.5);
         EXPECT_NEAR(newPos.at(1), 0, 0.5);
         EXPECT_NEAR(newPos.at(2), 0, 0.5);
-
+        
         delete package;
 
     }
+    
 
     // Update Test Part 2: Check how drone movement affects the drone's battery charge
     TEST_F(DroneTest, UpdateBatteryDrain) {
         Drone drone = Drone(position, direction, droneObj);
+        drone.SetPath(path);
         Package* package = new Package(position, direction, packageObj);
         drone.AssignPackage(package);
-        drone.SetPath(path);
         ASSERT_EQ(drone.GetBattery()->GetMaxCharge(), 10000);
         ASSERT_EQ(drone.GetBattery()->GetBatteryReserve(), 10000);
 

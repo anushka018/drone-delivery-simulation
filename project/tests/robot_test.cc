@@ -202,6 +202,7 @@ namespace csci3081 {
     // as it moves along the given path
     TEST_F(RobotTest, UpdatePositionTest) {
         Robot robot = Robot(position, direction, robotObj);
+        robot.SetPath(path);
         Package* package = new Package(position, direction, packageObj);
         robot.AssignPackage(package);
         ASSERT_EQ(position.size(), robot.GetPosition().size());
@@ -214,7 +215,6 @@ namespace csci3081 {
         }
 
         // Both speed and dt are set to zero
-        robot.SetPath(path);
         robot.SetSpeed(0.0);
         float dt = 0;
         robot.Update(dt);
@@ -337,9 +337,9 @@ namespace csci3081 {
     // Update Test Part 2: Check how Robot movement affects the Robot's battery charge
     TEST_F(RobotTest, UpdateBatteryDrain) {
         Robot robot = Robot(position, direction, robotObj);
+        robot.SetPath(path);
         Package* package = new Package(position, direction, packageObj);
         robot.AssignPackage(package);
-        robot.SetPath(path);
         ASSERT_EQ(robot.GetBattery()->GetMaxCharge(), 10000);
         ASSERT_EQ(robot.GetBattery()->GetBatteryReserve(), 10000);
 
