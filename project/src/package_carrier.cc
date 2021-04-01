@@ -27,7 +27,7 @@ void PackageCarrier::Update(float dt) {
   int index = std::distance(path.begin(), it);
   std::vector< std::vector<float> > customerPath(path.size() - index);
   std::copy(path.begin() + index, path.end(), customerPath.begin());
-
+  
   // PackageCarrier cannot move without battery power
   if (!(battery->IsDead())) {
     SetDirection(path[pathIndex]);
