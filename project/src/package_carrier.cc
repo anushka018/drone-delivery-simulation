@@ -23,10 +23,11 @@ PackageCarrier::PackageCarrier(std::vector<float> position, std::vector<float> d
 
 void PackageCarrier::Update(float dt) {
   // find segment of path from package to customer
-  std::vector< std::vector<float> >::iterator it = std::find(path.begin(), path.end(), currentPackage->GetPosition());
-  int index = std::distance(path.begin(), it);
-  std::vector< std::vector<float> > customerPath(path.size() - index);
-  std::copy(path.begin() + index, path.end(), customerPath.begin());
+  std::vector< std::vector<float> >::iterator start = std::find(path.begin(), path.end(), currentPackage->GetPosition());
+  std::vector< std::vector<float> >::iterator end = std::find(start, path.end(), (currentPackage->GetDestination()).GetVector());
+  int size = std::distance(start, end);
+  std::vector< std::vector<float> > customerPath(size);
+  std::copy(start, end, customerPath.begin());
   
   // PackageCarrier cannot move without battery power
   if (!(battery->IsDead())) {
@@ -51,6 +52,15 @@ void PackageCarrier::Update(float dt) {
   }
 }
 
+void PackageCarrier::GetNextPackagePath(std::vector< std::vector<float> >& packagePath) {
+  // Get path from last package's destination to next package
+  std::vector< std::vector<float> >::iterator start = std::find(path.begin(), path.end(), (currentPackage->GetDestination()).GetVector());
+  std::vector< std::vector<float> >::iterator end = std::find(start, path.end(), packages.at(1)->GetPosition());
+  int size = std::distance(start, end);
+  packagePath.resize(size);
+  std::copy(start, end, packagePath.begin());
+}
+
 void PackageCarrier::CarryPackage() {
     currentPackage->SetSpeed(speed_);
     currentPackage->SetPosition(posVector);
@@ -59,13 +69,20 @@ void PackageCarrier::CarryPackage() {
     if (position_.GetDistance(currentPackage->GetDestination()) <= currentPackage->GetRadius()) {
       currentPackage->SetPosition({0,-500,0});
       hasPackage = false;
-      // Remove package from list of scheduled deliveries
-      packages.erase(packages.begin());
       // Notify observers that package has been delivered
       picojson::value eventVal = CreateNotification("delivered");
       Notify(eventVal, *currentPackage);
       // Continue to next package to deliver if there are more scheduled
-      if (packages.size() > 0) {
+      if (packages.size() > 1) {
+        std::vector< std::vector<float> > packagePath;
+        GetNextPackagePath(packagePath);
+        // Remove package from list of scheduled deliveries
+        packages.erase(packages.begin());
+        currentPackage = packages.at(0);
+        std::cout << "Path size: " << packagePath.size() << std::endl;
+        // notify observers that package carrier is moving toward package
+        eventVal = CreateNotification("moving", packagePath);
+        Notify(eventVal, *this);
         currentPackage = packages.at(0);
       }
       else {
@@ -99,14 +116,16 @@ void PackageCarrier::AssignPackage(Package* package) {
   // notify the observers that the package has been scheduled
   picojson::value eventVal = CreateNotification("scheduled");
   Notify(eventVal, *currentPackage);
-  // find segment of path from carrier origin to package
-  std::vector< std::vector<float> >::iterator it = std::find(path.begin(), path.end(), currentPackage->GetPosition());
-  int index = std::distance(path.begin(), it);
-  std::vector< std::vector<float> > packagePath(index + 1);
-  std::copy(path.begin(), path.begin() + index + 1, packagePath.begin());
+  if (packages.size() == 1) {
+    // find segment of path from carrier origin to package
+  std::vector< std::vector<float> >::iterator end = std::find(path.begin(), path.end(), currentPackage->GetPosition());
+  int size = std::distance(path.begin(), end);
+  std::vector< std::vector<float> > packagePath(size);
+  std::copy(path.begin(), end, packagePath.begin());
   // notify observers that package carrier is moving toward package
   eventVal = CreateNotification("moving", packagePath);
   Notify(eventVal, *this);
+  }
 }
 
 picojson::value PackageCarrier::CreateNotification(std::string event, const std::vector< std::vector<float> >& path) {
