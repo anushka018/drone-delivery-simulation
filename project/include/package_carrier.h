@@ -104,6 +104,12 @@ class PackageCarrier : public EntityBase {
      * @param[in] destination vector with (x,y,z) float coordinates
      */
     void SetDirection(const std::vector<float>& dest) override;
+    /**
+     * @brief Get the path from the previous package's destination to the next scheduled package
+     * 
+     * @param path: input and output list of 3D float vectors for package carrier to follow 
+     */
+    void GetNextPackagePath(std::vector< std::vector<float> >& path);
 };
 
 }   // namespace csci3081
