@@ -23,10 +23,11 @@ PackageCarrier::PackageCarrier(std::vector<float> position, std::vector<float> d
 
 void PackageCarrier::Update(float dt) {
   // find segment of path from package to customer
-  std::vector< std::vector<float> >::iterator it = std::find(path.begin(), path.end(), currentPackage->GetPosition());
-  int index = std::distance(path.begin(), it);
-  std::vector< std::vector<float> > customerPath(path.size() - index);
-  std::copy(path.begin() + index, path.end(), customerPath.begin());
+  std::vector< std::vector<float> >::iterator start = std::find(path.begin(), path.end(), currentPackage->GetPosition());
+  std::vector< std::vector<float> >::iterator end = std::find(start, path.end(), (currentPackage->GetDestination()).GetVector());
+  int size = std::distance(start, end);
+  std::vector< std::vector<float> > customerPath(size);
+  std::copy(start, end, customerPath.begin());
   
   // PackageCarrier cannot move without battery power
   if (!(battery->IsDead())) {
