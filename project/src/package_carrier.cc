@@ -115,7 +115,7 @@ void PackageCarrier::AssignPackage(Package* package) {
   currentPackage = packages.at(0);
   // notify the observers that the package has been scheduled
   picojson::value eventVal = CreateNotification("scheduled");
-  Notify(eventVal, *currentPackage);
+  Notify(eventVal, *package);
   if (packages.size() == 1) {
     // find segment of path from carrier origin to package
   std::vector< std::vector<float> >::iterator end = std::find(path.begin(), path.end(), currentPackage->GetPosition());
