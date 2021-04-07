@@ -142,8 +142,13 @@ std::vector< std::vector<float> > PackageCarrier::GetPath() {
   return path;
 }
 
-void PackageCarrier::SetPath(const std::vector< std::vector<float> > newPath) {
+void PackageCarrier::SetPath(const std::vector< std::vector<float> >& newPath) {
   path = newPath;
+}
+
+std::vector< std::vector<float> > PackageCarrier::CreatePath(std::vector<float> carrierPosition, std::vector<float> packagePosition, 
+                                                        std::vector<float> customerPosition, const IGraph* graph) {
+  return strategy->CreatePath(carrierPosition, packagePosition, customerPosition, graph);
 }
 
 Battery* PackageCarrier::GetBattery() {
@@ -153,6 +158,7 @@ Battery* PackageCarrier::GetBattery() {
 
 PackageCarrier::~PackageCarrier() {
   delete battery;
+  delete strategy;
 }
 
 }   // namespace csci3081

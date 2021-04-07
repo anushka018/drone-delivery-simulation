@@ -8,6 +8,7 @@
 #include <string>
 #include "battery.h"
 #include "package.h"
+#include "smart_path.h"
 
 #ifndef ROBOT_H
 #define ROBOT_H

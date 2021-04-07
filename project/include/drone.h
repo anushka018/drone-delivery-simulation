@@ -8,6 +8,9 @@
 #include <string>
 #include "battery.h"
 #include "package.h"
+#include "smart_path.h"
+#include "beeline_path.h"
+#include "parabolic_path.h"
 
 #ifndef DRONE_H
 #define DRONE_H
@@ -33,7 +36,7 @@ class Drone : public PackageCarrier {
     */
     Drone(std::vector<float> position, std::vector<float> direction,
             const picojson::object& details, const std::string name = "Default Drone",
-                float speed = 0.0, float radius = 1.0, float batteryCapacity = 10000.0); 
+                float speed = 0.0, float radius = 1.0, float batteryCapacity = 10000.0, std::string pathStrategy = "smart"); 
 };
 
 }   // namespace csci3081

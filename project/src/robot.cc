@@ -12,6 +12,7 @@ Robot::Robot(std::vector<float> position, std::vector<float> direction,
                           PackageCarrier(position, direction, details, name, speed, radius, batteryCapacity) {
                                         
   type_ = "robot";
+  strategy = new SmartPath();
 }
 
 
