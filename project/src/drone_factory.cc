@@ -33,7 +33,12 @@ namespace csci3081 {
             if (contains) {
                 batteryCapacity = (float) JsonHelper::GetDouble(val, "battery_capacity");
             }
-            return new Drone(position, direction, val, name, speed, radius, batteryCapacity);
+            contains = JsonHelper::ContainsKey(val, "path");
+            std::string pathType = "";
+            if (contains) {
+                pathType = JsonHelper::GetString(val, "path");
+            }
+            return new Drone(position, direction, val, name, speed, radius, batteryCapacity, pathType);
         }
         return nullptr;
     }

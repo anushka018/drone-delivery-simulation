@@ -3,6 +3,7 @@
  * @author Audrey Kelly
  */
 #include "entity_base.h"
+#include "path_strategy.h"
 #include <vector>
 #include <string>
 #include "battery.h"
@@ -50,7 +51,19 @@ class PackageCarrier : public EntityBase {
      * 
      * @param[in] newPath: a list of vectors containing the float coordinate vectors of the path
      */
-    void SetPath(std::vector< std::vector<float> > newPath);
+    void SetPath(const std::vector< std::vector<float> >& newPath);
+    /**
+     * @brief Create the path using the drone or robot's assigned path strategy
+     * 
+     * @param[in]: carrierPosition, the origin of the drone or robot before delivery
+     * @param[in]: packagePosition, the position of the package to be picked up
+     * @param[in]: customerPosition, the destination for the package
+     * @param[in]: graph, an optional IGraph* only used for the smart route strategy
+     * 
+     * @return std::vector< std::vector<float> >: a complete path for package carrier to follow from origin to package to customer
+     */
+    std::vector< std::vector<float> > CreatePath(std::vector<float> carrierPosition, std::vector<float> packagePosition, 
+                                                        std::vector<float> customerPosition, const IGraph* graph = nullptr);
     /**
      * @brief Set the package pointer for the carrier
      * 
@@ -78,14 +91,15 @@ class PackageCarrier : public EntityBase {
      */
     virtual ~PackageCarrier();
 
- private:
+ protected:
     Battery* battery;
     Package* currentPackage;
     std::vector<Package*> packages;
     std::vector< std::vector<float> > path;
+    PathStrategy* strategy;
     int pathIndex;
     bool hasPackage;
-    //json object for event 
+
 
     /**
      * @brief Pick up and move the package along with the carrier.  
