@@ -99,7 +99,24 @@ void DeliverySimulation::Update(float dt) {
 		EntityBase* entity = dynamic_cast<EntityBase*> (GetEntities().at(i));
 		if (entity->IsDynamic()) {
 			entity->Update(dt);
+			Package* package = dynamic_cast <Package*>(entity);
+			//check isDropped
+			if (package) { 
+				std::cout << "IsDropped: " << package->GetIsDropped() << std::endl; 
+			}
+
+			if (package && package->GetIsDropped()) { 
+				std::cout << "adding package to dropped package vector" << std::endl;
+				dropped_packages.push_back(package);
+			}
 		}
+	
+	if (dropped_packages.size() != 0) { 
+		for (int i = 0; i< dropped_packages.size(); i++) {
+			ScheduleDelivery(dropped_packages.at(i), dropped_packages.at(i)->GetCustomer());
+			dropped_packages.pop_back();
+		}
+	}
 		
 		//check to see if package
 		//run if statements to see if it is in new section of delivery

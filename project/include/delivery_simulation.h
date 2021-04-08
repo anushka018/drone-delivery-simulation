@@ -131,6 +131,7 @@ class DeliverySimulation : public IDeliverySystem {
   std::vector<IEntityObserver*> observers;
   DeliveryScheduler* scheduler;
   const IGraph* map;
+  std::vector<Package*> dropped_packages;
 };
 
 }  // namespace csci3081

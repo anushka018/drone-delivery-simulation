@@ -29,6 +29,7 @@ void PackageCarrier::Update(float dt) {
   std::vector< std::vector<float> > customerPath(size);
   std::copy(start, end, customerPath.begin());
   
+  
   // PackageCarrier cannot move without battery power
   if (!(battery->IsDead())) {
     SetDirection(path[pathIndex]);
@@ -50,6 +51,22 @@ void PackageCarrier::Update(float dt) {
     }
     battery->DecreaseCharge(dt);
   }
+
+  if (!firstTimeDead && battery->IsDead()) {
+      currentPackage -> SetIsDropped(true);
+      firstTimeDead = true; 
+      // Notify observers that drone/robot has stopped moving
+      picojson::value eventVal = CreateNotification("idle");
+      Notify(eventVal, *this);
+
+      //change the height of the package
+      if (hasPackage) {
+        float x_position = currentPackage-> GetPosition().at(0);
+        float z_position = currentPackage-> GetPosition().at(2);
+        currentPackage-> SetPosition({x_position, 250 , z_position});
+      }
+  }
+
 }
 
 void PackageCarrier::GetNextPackagePath(std::vector< std::vector<float> >& packagePath) {

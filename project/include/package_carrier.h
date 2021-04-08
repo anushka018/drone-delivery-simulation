@@ -99,6 +99,7 @@ class PackageCarrier : public EntityBase {
     PathStrategy* strategy;
     int pathIndex;
     bool hasPackage;
+    bool firstTimeDead = false;
 
 
     /**

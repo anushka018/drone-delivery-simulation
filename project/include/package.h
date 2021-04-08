@@ -60,10 +60,15 @@ class Package : public EntityBase {
      */
     void SetDestination(Vector3D dest);
 
+    void SetIsDropped(bool isDropped_) { isDropped = isDropped_ ;}
+
+    bool GetIsDropped() { return isDropped ;}
+
  private:
     Vector3D destination;
     Customer* recipient;
     float weight_;
+    bool isDropped; 
 };
 
 }   // namespace csci3081
