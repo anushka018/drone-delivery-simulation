@@ -24,11 +24,16 @@ PackageCarrier::PackageCarrier(std::vector<float> position, std::vector<float> d
 void PackageCarrier::Update(float dt) {
   // find segment of path from package to customer
   std::vector< std::vector<float> >::iterator start = std::find(path.begin(), path.end(), currentPackage->GetPosition());
-  std::vector< std::vector<float> >::iterator end = std::find(start, path.end(), (currentPackage->GetDestination()).GetVector());
+  std::vector< std::vector<float> >::iterator end;
+  if (packages.size() > 1) {
+    end = std::find(start, path.end(), (currentPackage->GetDestination()).GetVector());
+  }
+  else {
+    end = path.end();
+  }
   int size = std::distance(start, end);
   std::vector< std::vector<float> > customerPath(size);
   std::copy(start, end, customerPath.begin());
-  
   // PackageCarrier cannot move without battery power
   if (!(battery->IsDead())) {
     SetDirection(path[pathIndex]);
@@ -50,6 +55,24 @@ void PackageCarrier::Update(float dt) {
     }
     battery->DecreaseCharge(dt);
   }
+  if (!firstTimeDead && battery->IsDead()) {
+      for (Package* package : packages) {
+        package-> SetIsDropped(true);
+      }
+      packages.erase(packages.begin());
+      firstTimeDead = true; 
+      // Notify observers that drone/robot has stopped moving
+      picojson::value eventVal = CreateNotification("idle");
+      Notify(eventVal, *this);
+
+      //change the height of the package
+      if (hasPackage) {
+        float x_position = currentPackage->GetPosition().at(0);
+        float z_position = currentPackage->GetPosition().at(2);
+        currentPackage->SetPosition({x_position, 250 , z_position});
+      }
+  }
+
 }
 
 void PackageCarrier::GetNextPackagePath(std::vector< std::vector<float> >& packagePath) {
@@ -83,7 +106,6 @@ void PackageCarrier::CarryPackage() {
         // notify observers that package carrier is moving toward package
         eventVal = CreateNotification("moving", packagePath);
         Notify(eventVal, *this);
-        currentPackage = packages.at(0);
       }
       else {
         // Notify observers that drone has stopped moving
@@ -122,6 +144,7 @@ void PackageCarrier::AssignPackage(Package* package) {
   int size = std::distance(path.begin(), end);
   std::vector< std::vector<float> > packagePath(size);
   std::copy(path.begin(), end, packagePath.begin());
+  packagePath.push_back(currentPackage->GetPosition());
   // notify observers that package carrier is moving toward package
   eventVal = CreateNotification("moving", packagePath);
   Notify(eventVal, *this);
