@@ -7,6 +7,7 @@ namespace csci3081 {
 
 DeliverySimulation::DeliverySimulation() {
 	entityFactory = new CompositeFactory();
+	dropped_packages = {};
 }
 
 DeliverySimulation::~DeliverySimulation() {
@@ -60,7 +61,7 @@ void DeliverySimulation::ScheduleDelivery(IEntity* package, IEntity* dest) {
 		if (entity)  {
 			carrier = dynamic_cast<PackageCarrier*>(GetEntities().at(i));
 			// Only schedule delivery if all casted pointers are valid
-			if (carrier && pack && customer) {
+			if (carrier && !carrier->GetBattery()->IsDead() && pack && customer) {
 				possibleCarriers.push_back(carrier);
 			}
 		}
@@ -99,23 +100,18 @@ void DeliverySimulation::Update(float dt) {
 		EntityBase* entity = dynamic_cast<EntityBase*> (GetEntities().at(i));
 		if (entity->IsDynamic()) {
 			entity->Update(dt);
-			Package* package = dynamic_cast <Package*>(entity);
-			//check isDropped
-			if (package) { 
-				std::cout << "IsDropped: " << package->GetIsDropped() << std::endl; 
-			}
-
-			if (package && package->GetIsDropped()) { 
-				std::cout << "adding package to dropped package vector" << std::endl;
-				dropped_packages.push_back(package);
-			}
 		}
-	
-	if (dropped_packages.size() != 0) { 
-		for (int i = 0; i< dropped_packages.size(); i++) {
-			ScheduleDelivery(dropped_packages.at(i), dropped_packages.at(i)->GetCustomer());
-			dropped_packages.pop_back();
+		Package* package = dynamic_cast <Package*>(entity);
+		if (package && package->GetIsDropped()) { 
+			// std::cout << "adding package to dropped package vector" << std::endl;
+			dropped_packages.push_back(package);
 		}
+		if (dropped_packages.size() > 0) { 
+			for (int i = 0; i< dropped_packages.size(); i++) {
+				ScheduleDelivery(dropped_packages.at(i), dropped_packages.at(i)->GetCustomer());
+				package->SetIsDropped(false);
+				dropped_packages.erase(dropped_packages.begin());
+			}
 	}
 		
 		//check to see if package

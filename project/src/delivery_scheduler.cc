@@ -18,7 +18,6 @@ namespace csci3081 {
         if (package->GetDestination().GetDistance(Vector3D(package->GetPosition())) <= package->GetRadius()) {
 		    return;
 	    }
-        
         PackageCarrier* carrier = FindClosestCarrier(Vector3D(package->GetPosition()), carriers);
         if (carrier) {
             // Create path from drone/robot to package to customer
