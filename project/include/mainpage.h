@@ -1,156 +1,209 @@
 /*! \mainpage CSCI 3081 Delivery Simulation project
-* UMN Package Delivery Simulation {#mainpage} 
-# I ATTEMPTED EXTRA CREDIT SCENES
-## New User Guide 
-Welcome to the UMN Campus package-delivery simulation! This simulation uses drones to deliver packages to customers across the University of Minnesota campus in Minneapolis. Consider this program a sneak peek into the future; you will be able to envision the efficiency and speed package deliveries. Customers will order packages and receive them in just a few minutes via a local drone waiting to deliver their order. To get started with the simulation, you will need to download the code from the git repository: https://github.umn.edu/umn-csci-3081-s21/repo-kell2416.git. 
-
-If this is your first time cloning a git repository, here are the steps you can follow. If you have used Git before, you can skip to section two entitled **Cloning Project Repository**.
-
-### Setting Up Git
-1. Open up a terminal on your computer
-    - On Mac, you can press Shift – Command(⌘) – U 
-    - On Windows, you can use the shortcut Windows key + X + C (or A for admin). 
-2. If you are brand new to Git and have not installed it on your machine, please download it following the instructions at https://git-scm.com/book/en/v2/Getting-Started-Installing-Git. 
-3. Check to make sure your Git account is configured correctly on your machine. The terminal command `$ git config --list --show-origin` will list the current settings. If you are installing git for the first time, run the following commands with your name and email address.
-```
-$ git config --global user.name "John Doe"
-$ git config --global user.email johndoe@example.com
-```
-4. Once you are finished with this step, you can run `$ git config --list`  again to ensure that your settings are correct. 
-
-### Cloning Project Repository
-
-1. Now, navigate to the directory where you would like to download and run the project from. If you are new to Linux terminal commands, you can use 
-`$ mkdir DeliverySimulation` to create the directory. 
-2. To move to this new directory, use the command `$ cd DeliverySimulation`
-3. Once you are in the desired directory, clone the repository with the above link using the following command:
-`$ git clone https://github.umn.edu/umn-csci-3081-s21/repo-kell2416.git`
-
-### Building the Docker Container
-
-1. To configure and run the program on your local machine, you will need to install a Docker Container. This container contains the necessary configuration files and libraries for the program and prevents the pain of having to download them all separately on your machine. First you should install Docker Desktop from https://www.docker.com/products/docker-desktop. 
-2. Once Docker is installed, run the following command in your new directory to build the docker image
-    `$ bin/build-env.sh`
-This may take a few minutes. 
-3. After the build script has completed, type in the command to run the Docker container
-    `$ bin/run-env.sh`
-4. You are now in the Docker Container! You can exit the container at any time by entering the command `$ exit` into your terminal. 
-
-### Compiling and Running the Code
-1. You should now have the code and the necessary software to run the simulation! To see the list of files and directories in the project, you can use the terminal command `$ ls`
-2. Change directories to the project directory with `$ cd project`
-3. Run the command `$ make` to compile the code and build the executables. This may take a few seconds but you will know it is finished when you can see your username and directory location again with $ at the terminal prompt. 
-4. Once the compiling is finished, you can run the project with the command 
-    `$ ./bin/run.sh`
-This command runs the script for the delivery simulation.
-
-### Viewing the Simulation
-
-1. To see the simulation, go to http://127.0.0.1:8081/ at the browser of your choice. The simulation has been successfully tested using Safari, Chrome, and Firefox but graphics appear best on Google Chrome. 
-2. On the simulation screen, you should see a 3D map of the UMN Twin Cities campus with buildings, streets, and natural features such as the Mississippi River. In the upper left corner of your screen, you should see the navigation menu. Here you can set the simulation speed, change your view to different objects in the simulation, and kill the simulation when you are finished. The two checkboxes on the lower half of the menu highlight the smart routes simulation entities can follow streets and walkways to avoid buildings. 
-<img src="Drone1.png" alt="Drone flying in simulation" width="600"/>
-
-3. To see the drone pick up the package and deliver it to the customer, it is suggested to change your view to **drone**. You can use your mouse or your touchpad to zoom in and out on the simulation. 
-4. You can follow the drone’s movement as it navigates to the package, picks it up, and then navigates to the customer for delivery. 
-<img src="AllEntities.png" alt="Drone reaching customer in simulation" width="600"/>
-
-5. Once the drone has reached the customer, the customer robot will receive the package and the package will no longer be visible in the simulation. **You must press the “kill simulation” button** or the program will continually run on your machine. Make sure to press the “kill simulation” button each time you run the simulation. 
-
-## Factory Implementation for Entity Creation
-In the delivery simulation, there are currently three types of entities derived from the EntityBase class: drones, packages, and customers. The development of truck and robot entities to facilitate more deliveries is scheduled for future releases of the simulation. The delivery simulation project was designed following the DRY and SOLID principles for software development. The “O” in the SOLID acronym represents the Open/Closed Principle which states  "software entities should be open for extension, but closed for modification."  When considering which factory pattern to implement for entity creation, it is critical to adhere to the Open/Closed principle. This will prevent having to vigorously refactor code and risk erroneous behavior when trying to extend the simulation. Another important consideration was to encapsulate the entity creation and keep it loosely coupled with other systems in the simulation. Having stated this background and motivation, I will now explain my choice to use the Composite-Factory pattern over the Concrete Factory and Abstract Factory patterns for entity creation. 
-
-## Concrete Factory Pattern 
-The three distinct versions of the Factory Pattern share one commonality: they decouple or separate the creation of entities from the entity classes themselves. To implement the Concrete Factory pattern in the delivery simulation, we could create an EntityFactory Class and define a CreateEntity method in this class. As seen in the UML diagram below, the Concrete Factory class would create each of the three entities with this CreateEntity method.
-<img src="ConcreteFactory.png" alt="Concrete Factory UML" width="600"/>
-
-The CreateEntity method could be defined as follows:
-
-    IEntity* CreateEntity(const picojson::object& val) {
-        if (JsonHelper::GetString(val, "type") == "drone") {
-            std::vector<float> position = JsonHelper::GetStdFloatVector(val, "position");
-            std::vector<float> direction = JsonHelper::GetStdFloatVector(val, "direction");
-        return new Drone(position, direction, val);
-    }
-        if (JsonHelper::GetString(val, "type") == "customer") {
-            std::vector<float> position = JsonHelper::GetStdFloatVector(val, "position");
-            std::vector<float> direction = JsonHelper::GetStdFloatVector(val, "direction");
-        return new Customer(position, direction, val);
-    }
-        if (JsonHelper::GetString(val, "type") == "package") {
-            std::vector<float> position = JsonHelper::GetStdFloatVector(val, "position");
-            std::vector<float> direction = JsonHelper::GetStdFloatVector(val, "direction");
-            return new Package(position, direction, val);
-        }
-        return NULL;
-    }
-
-
-The CreateEntity method takes in a picojson object as its argument and checks the type attribute of this object for which entity to create. Without the concrete factory, this method would have to be a part of the Delivery Simulation program itself. By calling the different entity constructors from within the program, we are coupling the program with each entity type. In contrast, the Concrete Factory decouples the creation logic of entities from the delivery simulation program itself. This follows the Single Responsibility Principle of SOLID because the delivery simulation class no longer has two responsibilities. It now only has the purpose of running the delivery instead of object creation and running the delivery process. 
-A drawback for the Concrete Factory implementation is that it violates the Open/Closed Principle. If we would like to add more types of entities such as trucks and robots in the future, we will have to go back and add more if statements into the factory. Therefore modification of the code will be required instead of an extension of the code as desired. Another drawback of the Concrete Factory is that the factory class remains tightly coupled with each concrete Entity class. Due to these drawbacks, I decided not to use the Concrete Factory pattern in my simulation. 
-
-## Abstract Factory Pattern
-The next type of Factory Pattern I considered was the Abstract Factory pattern. The Abstract Factory handles entity creation by using an abstract EntityFactory class with a purely virtual CreateEntity method. Subsequently, factory subclasses are inherited from this abstract class for each type of entity (drone, customer, and package). Each factory subclass has the single responsibility of creating their unique entity type. Using polymorphism, each subclass overrides the CreateEntity method to construct its entity type.
-
-<img src="AbstractFactory.png" alt="Abstract Factory UML" width="600"/>
-
-The advantage of the Abstract Factory is that it obeys the Open/Closed Principle, unlike the Concrete Factory. All of the CreateEntity methods in the factory subclasses are closed to modification, but we can extend the virtual CreateEntity method to add entity types. For example, if we wanted to add a Truck entity type to the simulation, we could create a TruckFactory and extend the CreateEntity method into this class. 
-
-The drawback to this method is that to implement this abstract factory, we must bring back the if statements into the delivery simulation program itself. To build an entity, the program must know which type of EntityFactory to create:
-
-    EntityFactory* entityFactory; 
-
-    if (drone) {
-    entityFactory = new DroneFactory();
-    }
-    else if (package) {
-    entityFactory = new PackageFactory();
-    }
-    else if (customer) {
-    entityFactory = new CustomerFactory();
-    }
-
-    IEntity* entity = entityFactory->CreateEntity();
-
-Therefore, the delivery simulation program is still tightly coupled with the types of each entity factory. While the abstract factory pattern satisfies the Open/Closed Principle in entity creation, it fails the same principle in factory creation. If we want to add trucks and robots to the simulation, we will need to add more factory subclasses to EntityFactory and have to modify the above code snippet. This drawback led me to consider finding a better alternative to entity creation with the Composite Factory pattern. 
-
-## Composite Factory Pattern
-The Composite Factory can be viewed as an extension of the Abstract Factory Pattern that satisfies both the Single Responsibility Principle and the Open/Closed Principle. We create an additional subclass of the abstract EntityFactory class called CompositeFactory. This composite factory class contains a factory list with each type of entity factory subclass. 
-<img src="CompositeFactory.png" alt="Composite Factory UML" width="600"/>
-
-The overridden CreateEntity method in CompositeFactory iterates through the factories and attempts to create an entity with each one. Only one factory subclass will end up succeeding because each CreateEntity method is dependent on the type of the picojson object passed as the parameter. 
-
-    IEntity* CompositeFactory::CreateEntity(const picojson::object& val) {
-            for (IEntityFactory* factory: factories) {
-                IEntity* entity = factory->CreateEntity(val);
-                if (entity) {
-                    return entity;
-                }
-            }
-            return NULL;
-        }
-
-Out of the three factory patterns discussed, the Composite Factory pattern is arguably the most extensible. To add a new entity type, we no longer need to refactor or modify any code in either the delivery simulation application or existing factories themselves. Instead, we create a new factory class derived from EntityFactory and override the CreateEntity method to build the new entity type. Subsequently, we add this new factory class into CompositeFactory’s factory list such that it is iterated in each call to CreateEntity. Therefore we are completely satisfying the Open/Closed Principle with this approach. Another advantage is that this approach satisfies DRY software principles the most out of the three because there are no repetitive if statements for either factory or entity creation. The delivery simulation program is no longer tightly coupled with specific entity types or factory types. The code to create an entity has been simplified to:
-
-    DeliverySimulation::DeliverySimulation() {
-    entityFactory = new CompositeFactory();
-    }
-
-    IEntity* DeliverySimulation::CreateEntity(const picojson::object& val) {
-    return entityFactory->CreateEntity(val);
-    }
-
-Factory classes are tasked with the single responsibility of entity creation and the delivery simulation program is no longer aware of these details or dependencies. 
-Potential drawbacks to the Composite Factory pattern include the fact that we must add a new factory to the Composite list if we want to add an entity type. With the three existing types of entities, the CompositeFactory constructor is as follows:
-
-    CompositeFactory::CompositeFactory() {
-        factories.AddFactory(new DroneFactory());
-        factories.AddFactory(new CustomerFactory());
-        factories.AddFactory(new PackageFactory());
-    }
-
-It is clear that the Composite Factory is still coupled with each Factory class. If we were to add trucks and robots to the application, we would need to modify this constructor with the new factory types accordingly. The second potential drawback to the Composite Factory pattern is found in one of its strengths: generality. Each time CreateEntity is called, the entire list of each type of factory is iterated through. In a future release, consider a situation where the client wants to restrict the delivery simulation to using only trucks instead of drones or robots. With the composite factory pattern, there would be no way to dynamically not include the drone or robot factory as part of the composite. Thus this pattern is burdened with the difficulty of distinguishing between the composite factory and the non-composite factories. 
-
-Despite these drawbacks, the Composite pattern is the most adherent to the Open/Closed principle of the three factory patterns. Extensibility is incredibly simple; to add a new entity type we only need to create a new factory class, override the create entity method, and add the factory to the Composite Factory class. The Composite Factory closes the code for the Delivery Simulation and existing entities to modification. Finally, it also provides high cohesion to the classes in the program overall by separating entity creation from the delivery process. Therefore the Composite Factory is the best software design choice for the delivery simulation program. 
+*
+* To generate documentation, first build the project with `make` in the `project` directory.
+* Next, navigate to `project/docs` and run `doxygen Doxyfile`.
+* Then open `project/docs/html/index.html` in your web browser to view the documentation.
+*
+* Goal of the simulation: A drone navigates to a package, picks it up, and then delivers it to a customer. 
+* Once the drone has dropped off the package to the customer, the package disappears from the simulation.
+* The simulation is currently being run on a map of the University of Minnesota campus. The
+* drone follows a "smart route" to the package and from the package to the customer. The smart route
+* is determined using the A* shortest path graph traversal algorithm. 
+* 
+* User Guide:
+* 1. Clone the remote repository at https://github.umn.edu/umn-csci-3081-s21/repo-angam003
+* 2. Obtain access to a Linux environment and run the simulation
+*
+*   a. Docker
+*
+*       i. Install Docker Desktop on your local machine (if you have Windows 10 install wsl2 and Ubuntu and if you have Linux use docker group instead of sudo)
+*  
+*       ii. cd to the root directory of the cloned repository 
+*
+*       iii. enter the command $ bin/build-env.sh
+*
+*       iv. enter the command $ bin/run-env.sh
+*
+*       v. inside the docker image cd to the project directory and enter the command $ make
+*
+*       vi. enter the command $ ./bin/run.sh within the project directory to run the simulation
+*
+*       vii. Open up Firefox and browse to http://127.0.0.1:8081/
+*
+*   b. SSH
+*
+*       i. SSH onto a CSE Labs machine using your UMN login 
+*
+*       ii. cd to the root directory of the cloned repository 
+*
+*       iii. set up the remote web server by entering the command $ ./project/bin/setup-server.sh <username> <computer_number> 
+*       where username is your x500 and computer number is the lab machine you are currently ssh'd onto
+*
+*       iv.  run the remote web server by entering the command $ ./project/bin/server.sh <username> <computer_number> <port> where port is 8081
+*
+*       v. Open up Firefox and browse to http://127.0.0.1:8081/
+*
+*   c. VOLE
+*
+*       i. Log in to VOLE or VOLE 3D at the link https://cse.umn.edu/cseit/virtual-online-linux-environment-self-help-guide
+*
+*       ii. cd to the root directory of the cloned repository 
+*
+*       iii. cd to the project directory and enter the command $ make
+*
+*       iv. still within the project directory and enter the command $ ./bin/run.sh to run the simulation
+*
+*       v. Open up Firefox and browse to http://127.0.0.1:8081/
+*
+*
+* Discussion of Composite Factory Pattern
+*
+* - Pro
+*
+* The composite factory pattern combines the factory design pattern and the composite design pattern. The factory pattern implements an interface for the creation of entities
+* which is currently drones, packages, and customers. In our case, this is done in the IEntity Factory class which creates IEntity objects from the IEntity class.
+* Both of these classes are abstract. It then pushes the creation of these entities to subclasses which, in this case, are the drone factory, package factory,
+* and customer factory classes. These classes are then responsible for determining which entity to instantiate (ie which create entity method will be called). 
+* The composite pattern groups together drone, customer, and package entities so that we can add them to a composite factory object. Then we can create each of our
+* entities by iterating through the all component objects stored in the composite object, which is represented as a vector in this case, and call the create entity 
+* method on each component object. This is useful because it allows us to enforce SOLID software development principles while also allowing us to only call
+* the create entity method on the composite factory object. 
+*
+* - Con 
+*
+* Some potential cons of the composite factory implementation are that it creates many layers of abstraction and it may be difficult to create a shared interface
+* for each of the object classes with a largely disjoint functionality. This means that in certain cases, you may be forced to make the interface for the components
+* overgeneralized. This can make it more challenging to comprehend. The composite factory method pattern may also be used improperly and not 
+* provide a realistic understanding of how the production code will be extremely likely to evolve. 
+*
+*
+* Discussion of Concrete Factory Pattern vs. Abstract Factory Pattern vs. Composite Factory Pattern
+* 
+* Concrete Factory Pattern
+*
+* - Pro
+* 
+* The concrete factory pattern allows factory classes to handle all the creation logic instead of the program. This means that the client does not need to worry about
+* creating objects, but instead, they pass parameters for object creation to a method in the factory class. This is beneficial because changes to the factory design
+* do not require the client to make changes on their side - meaning they do not have to recompile their code to interact with the factory. The concrete factory pattern 
+* also allows for the creation of objects of different types because you do not need to specify the type of an object during its creation. Finally, we can also encapsulate
+* instantiations for concrete types and create objects through inheritance. This allows us to follow good object-oriented design principles. 
+*
+* - Con
+* 
+* A downside of the concrete factory pattern, however, is that it does not remove the need for the dreaded if statements. This also means that it is not closed to modification 
+* or open to extensibility. This is because whenever we add a new type of object, we will also need to add another class. We need the if statements because we still 
+* need to check the type of object, so we know which creation method to call. Another disadvantage of the simple factory pattern is that there is still reasonably 
+* high coupling between the main factory class and each of the object type subclasses. This is where the abstract factory pattern comes into play. 
+*
+* Concrete Factory Pattern UML
+*
+* ![Concrete Factory Pattern UML](../images/ConcreteFactory.png)
+*
+*
+* Abstract Factory Pattern
+*
+* - Pro
+*
+* The abstract factory provides an interface for creating families of related, dependent objects without specifying their concrete classes by
+* creating objects through composition and pushing object creation to subclasses. 
+* This allows us to take advantage of run-time polymorphism. It also provides for looser coupling between classes
+* by getting rid of the need to include the disadvantageous sequence of if statments which violate good software design principles. 
+* We also do not need to edit the base factory class when we add new object types to the factory creation. This helps us utilize good design by making our
+* program closed to modification. Since the creation is not linked to a specific class, the abstract factory pattern is 
+* a very flexible approach. 
+*
+* - Con 
+*
+* The abstract factory may or may not be able to be implemented in your program design depending on if there is a possibility to remove the dreaded sequence 
+* of if statements in your code. If the design of the code does not allow for the removal of the if statements, the abstract factory method pattern is not 
+* the best design pattern choice for your software project. In this case, the concrete factory pattern is the most likely the most advantageous design pattern choice.
+* A second disadvantage is that it is difficult to support the creation of new types of objects using this pattern. This is because the interface fixes 
+* the set of products that can be created. 
+* 
+* Abstract Factory Pattern UML
+*
+* ![Abstract Factory Pattern UML](../images/AbstractFactory.png)
+*
+*
+* Composite Factory Pattern
+*
+* - Pro
+* 
+* The composite pattern allows a group of objects to be treated as a single object. It is a factory that creates multiple types of objects.
+* The objects are recognized as a hierarchy and can be visualized as a tree-like structure. 
+* The composite factory pattern is beneficial because it allows for extensions of an existing software system to incorporate new features without the need to perform regression testing. 
+* It also guards against the violation of the open/closed software design principle. This principle states that a well-designed software system is one that is 
+* open to extension and closed to change. Finally, we only need to call the create method on the composite factory object instead of on each of the component
+* objects when implementing the composite factory pattern.
+*
+* - Con 
+*
+* A con of the composite factory pattern is that it may make code more difficult to read. This could be because all of the code written is hidden behind an
+* abstraction which may in turn hide other abstractions. Going through these multiple layers of abstraction may make code challenging to read and interpret
+* for software engineers implementing the pattern and those who may need to look at and understand the production code later. In addition, this design 
+* pattern requires the creation of additional classes and additional code which may also make the general control flow of the program harder to 
+* understand. 
+*
+* Composite Factory Pattern UML
+*
+* ![Composite Factory Pattern UML](../images/CompositeFactory.png)
+* 
+*
+*
+*
+* Designing and Implementing Different Routes Discussion
+*
+*
+* The Strategy Pattern
+*
+* To implement the strategy pattern for the path behavior of drones and robots, we first created an abstract PathStrategy class with a virtual CreatePath method. Our initial implementation of CreatePath took in three parameters: the origin of the drone/robot, the package position, and the customer position. The purpose of the CreatePath method is to create the complete path for the drone or robot to follow for the entire delivery, from the package pick up to drop off. The PathStrategy class serves as the base class for each of the concrete path strategies: smart route, beeline, and the parabolic paths. Each of the derived classes overrides the virtual CreatePath method with their own unique definition for their class name. 
+* 
+* Generalized Strategy Pattern UML
+*
+* ![UML of Generalized Strategy Pattern](../images/General_Strategy_Pattern_UML.PNG)
+*
+* Strategy Pattern for Drone Paths UML
+*
+* ![UML of Strategy Pattern for Drones Paths] (../images/Strategy_Pattern_Drones_UML.PNG)
+*
+* In the previous iteration, our simulation code used the smart route for all package deliveries. The best tip for implementing the smart route is to look at the provided documentation for Graph.h in the base code. We had a DeliveryScheduler class to help with delivery set up and the CreatePath method was originally in this class. To implement the CreatePath in the SmartPath class we copied and pasted over this method. The problem that we encountered was that the Smart Route relies on an IGraph pointer to the graph for that json scene. We were stuck on how to share this graph pointer from DeliveryScheduler to the SmartPath class without tightly coupling these classes which are not strongly related. Our solution to this problem was to add an additional, optional IGraph* parameter to the CreatePath method. This way we can pass this IGraph pointer from the DeliveryScheduler when we prompt the package carrier (drone or robot) to create the path with their assigned strategy. The beeline and parabolic paths do not need this pointer, however this was the best idea we had to avoid tightly coupling these classes. 
+* 
+* To follow DRY software design, both drones and robots are derived from an abstract PackageCarrier class that contains their path attribute and methods for motion. Therefore we added a PathStrategy pointer as an attribute to this PackageCarrier class.
+* 
+* The beeline route entails a drone moving directly from its starting location to a package and finally directly to the package's associated customer location. In order to implement the beeline path, we wrote a class that inherited from our abstract path strategy class which overrode the CreatePath method. To build the path within this method, we simply created a vector of float vectors to store the path and added to it the package carrier;s location (the drone or robot) and the customer’s location. We also ensured to raise the height of the package carrier to 400 when it was travelling to the package and the customer so that it would not run into any buildings. We were able to utilize a similar thought process that one of our team members, who chose the beeline route instead of the smart route, utilized in the previous iteration. 
+* 
+* Finally, the third path strategy implemented in this iteration was the parabolic path. This was the most challenging to implement given that an understanding of riemann sums and calculus was required. In addition, this path strategy was not implemented by any of our team members in iteration 1 so it was an entirely new concept. Lab 14, which provided information on how to implement the strategy pattern was incredibly useful. In addition, chapter 2 of the head first design in combination with lectures nineteen and twenty were helpful in understanding the strategy pattern from a high level. 
+* 
+* In terms of understanding the mathematics behind the implementation for the parabolic path, the youtube video posted on the course website about riemann sums and the Powerpoint slides describing how to build a better jump were helpful. Our team was extremely grateful for the second approach to the parabolic path posted by 1 of the TAs as we felt like this made more sense then the instruction in lab 14. This was something we relied heavily on in our design of the parabolic path strategy.
+* 
+* To implement the parabolic path, we created a new class which inherited from our abstract path strategy class as our beeline and smart route strategies did as well. In this class we override the createpath method once again. To build the parabolic path, we first initialize the starting position of the carrier and the first destination to the package. Next, we set the height of the jump which we initialized to 1.0. Then, we created the path from the carrier to the package using the formula to update the x, y, and z coordinates as follows: 
+*
+* dt = i / 101, where is ranges from 0 - 100 
+*
+* x = initialX + (finalX - initialX)*dt, update x with its value plus change in x times dt
+*
+* z = initialZ + (finalZ - initialZ)*dt, update z with its value plus change in z times dt
+*
+* y = ((4*height)+(-2*initialY)+(-2*finalY))*dt*dt + ((-4*height)+(3*initialY) + finalY)*dt + initialY, set y equal to 4 times the height plus -2 times the initial height + -2 times the new height times dt squared plus -4 times the height plus 3 times the initial height + dt times the new height plus the initial height
+*
+* Next, we reset the x, y, and z coordinates to reset the jump from the package to the customer and build up the path from the package to the customer using the same logic outlined in the formulas above. 
+*
+*
+* Links to the resources mentioned above are provided below:
+*
+* 1. Lab 14 - Implementing the strategy pattern: https://github.umn.edu/umn-csci-3081-s21/shared-upstream/tree/support-code/labs/Lab14_Strategy_Drone_Routes 
+*
+* 2. Lectures 19 & 20 on the strategy pattern:
+*
+*       a. Lecture 19: https://canvas.umn.edu/courses/217398/files/20413893?module_item_id=5865925 
+*
+*       b. Lecture 20: https://canvas.umn.edu/courses/217398/files/20471109?module_item_id=5873223
+*
+* 3. YouTube Video on Riemann Sums: https://www.youtube.com/watch?v=XrMSfljzBRg 
+* 
+* 4. PowerPoint Slides on Building a Better Jump: http://www.mathforgameprogrammers.com/gdc2016/GDC2016_Pittman_Kyle_BuildingABetterJump.pdf 
+*
+* 5. Head First Design Patterns Textbook from the UMN Library: https://primo.lib.umn.edu/primo-explore/search?query=any,contains,head%20first%20design%20patterns&search_scope=mncat_discovery&vid=TWINCITIES&lang=en_US 
+*
 */
-
-
