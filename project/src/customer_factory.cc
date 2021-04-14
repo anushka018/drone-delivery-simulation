@@ -11,10 +11,15 @@ namespace csci3081 {
         if (JsonHelper::GetString(val, "type") == "customer") {
             std::vector<float> position = JsonHelper::GetStdFloatVector(val, "position");
             std::vector<float> direction = JsonHelper::GetStdFloatVector(val, "direction");
-            std::string name = JsonHelper::GetString(val, "name");
+            bool contains = false;
+
+            std::string name = "";
+            contains = JsonHelper::ContainsKey(val, "name");
+            if (contains) {
+                name = JsonHelper::GetString(val, "name");
+            }
             
             float radius = 1.0;
-            bool contains = false;
             contains = JsonHelper::ContainsKey(val, "radius");
             if (contains) {
                 radius = (float) JsonHelper::GetDouble(val, "radius"); 

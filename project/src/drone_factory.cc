@@ -4,7 +4,7 @@
  */
 #include "drone_factory.h"
 
-namespace csci3081 {
+namespace csci3081 { 
     DroneFactory::DroneFactory() {};
 
     IEntity* DroneFactory::CreateEntity(const picojson::object& val) {

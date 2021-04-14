@@ -20,7 +20,6 @@ PackageCarrier::PackageCarrier(std::vector<float> position, std::vector<float> d
   path = {};
 }
 
-
 void PackageCarrier::Update(float dt) {
   // find segment of path from package to customer
   std::vector< std::vector<float> >::iterator start = std::find(path.begin(), path.end(), currentPackage->GetPosition());
@@ -70,11 +69,10 @@ void PackageCarrier::Update(float dt) {
         float x_position = currentPackage->GetPosition().at(0);
         float z_position = currentPackage->GetPosition().at(2);
         currentPackage->SetPosition({x_position, 250 , z_position});
-      }
+      } 
   }
-
 }
-
+ 
 void PackageCarrier::GetNextPackagePath(std::vector< std::vector<float> >& packagePath) {
   // Get path from last package's destination to next package
   std::vector< std::vector<float> >::iterator start = std::find(path.begin(), path.end(), (currentPackage->GetDestination()).GetVector());
@@ -83,7 +81,7 @@ void PackageCarrier::GetNextPackagePath(std::vector< std::vector<float> >& packa
   packagePath.resize(size);
   std::copy(start, end, packagePath.begin());
 }
-
+ 
 void PackageCarrier::CarryPackage() {
     currentPackage->SetSpeed(speed_);
     currentPackage->SetPosition(posVector);
@@ -148,9 +146,9 @@ void PackageCarrier::AssignPackage(Package* package) {
   // notify observers that package carrier is moving toward package
   eventVal = CreateNotification("moving", packagePath);
   Notify(eventVal, *this);
-  }
+  } 
 }
-
+ 
 picojson::value PackageCarrier::CreateNotification(std::string event, const std::vector< std::vector<float> >& path) {
   picojson::object eventObj = JsonHelper::CreateJsonNotification();
   JsonHelper::AddStringToJsonObject(eventObj, "value", event);
@@ -173,15 +171,14 @@ std::vector< std::vector<float> > PackageCarrier::CreatePath(std::vector<float> 
                                                         std::vector<float> customerPosition, const IGraph* graph) {
   return strategy->CreatePath(carrierPosition, packagePosition, customerPosition, graph);
 }
-
+ 
 Battery* PackageCarrier::GetBattery() {
   return battery;
-
 }
 
 PackageCarrier::~PackageCarrier() {
   delete battery;
   delete strategy;
 }
-
+ 
 }   // namespace csci3081
