@@ -22,9 +22,8 @@ namespace csci3081 {
         if (carrier) {
             // Create path from drone/robot to package to customer
             std::vector< std::vector<float> > carrierPath = carrier->CreatePath(carrier->GetPosition(), package->GetPosition(), 
-                                                                                                    customerLocation, graph_);
-            std::cout << "Size in scheduler " << carrierPath.size() << std::endl;                                                                                       
-		    carrier->SetPath(carrierPath);
+                                                                                                    customerLocation, graph_);                                                                                      
+		    carrier->SetPath(carrierPath); 
 		    carrier->AssignPackage(package);
         }
         else {
