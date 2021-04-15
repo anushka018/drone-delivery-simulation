@@ -429,6 +429,7 @@ namespace csci3081 {
         // Check if observer is notified that package is scheduled
         testing::internal::CaptureStdout();
         system->ScheduleDelivery(packageEntity, customerEntity);
+
         std::string output1 = testing::internal::GetCapturedStdout();
         std::size_t found = output1.find("scheduled");
         std::size_t found2 = output1.find(std::to_string(package->GetId()));
@@ -443,6 +444,27 @@ namespace csci3081 {
         EXPECT_TRUE(contains);
         contains = found4 != std::string::npos;
         EXPECT_TRUE(contains);
+
+       std::string X = std::to_string((int) package->GetPosition().at(0));
+       std::string Y = std::to_string((int) package->GetPosition().at(1));
+       std::string Z = std::to_string((int) package->GetPosition().at(2));
+       std::string dronePosition = "[" + X + "," + Y + "," + Z +"]";
+
+       X = std::to_string((int) package->GetPosition().at(0));
+       Y = std::to_string((int) package->GetPosition().at(1));
+       Z = std::to_string((int) package->GetPosition().at(2));
+       std::string packagePosition = "[" + X + "," + Y + "," + Z +"]";
+
+
+        // Check that the path passed to the notification contains the drone's starting position and package position
+        std::size_t found5 = output1.find(packagePosition);
+        contains = found5 != std::string::npos;
+        EXPECT_TRUE(contains);
+        
+        std::size_t found6 = output1.find(dronePosition);
+        contains = found6 != std::string::npos;
+        EXPECT_TRUE(contains);
+    
 
         // move drone to package (using default smart path)
         testing::internal::CaptureStdout();
@@ -465,8 +487,24 @@ namespace csci3081 {
         contains = found4 != std::string::npos;
         EXPECT_TRUE(contains);
 
-        Vector3D(package->GetDestination()).Display();
+        // Check that path contains starting position of drone at the package pick-up spot
+        found5 = output1.find(packagePosition);
+        contains = found5 != std::string::npos;
+        EXPECT_TRUE(contains);
+
+        // Check if path contains the final position of the customer
+        X = std::to_string((int) package->GetDestination().GetX());
+        Y = std::to_string((int) package->GetDestination().GetY());
+        Z = std::to_string((int) package->GetDestination().GetZ());
+        std::string customerPosition = "[" + X + "," + Y + "," + Z +"]";
+        std::cout << customerPosition << std::endl;
+        
+        found6 = output1.find(customerPosition);
+        contains = found6 != std::string::npos;
+        EXPECT_TRUE(contains);
+
         testing::internal::CaptureStdout();
+        
         // drone moves package to customer
         while(Vector3D(drone->GetPosition()).GetDistance(Vector3D(package->GetDestination())) > 1.0) {
             system->Update(dt);
