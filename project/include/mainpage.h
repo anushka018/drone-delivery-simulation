@@ -261,4 +261,20 @@
 * Today we were able to get both the parabolic and the beeline route paths to work. The beeline path that we used in this portion of the code came from Anoushka's Iteration 1 cocde. We had to make some adjustments to her original code and work through the errors that came up, but after that the beeline was working correctly. We then started on Priority 4. The first bullet point was already completed in our code so we began working on idle drones and how to reschedule them.
 *
 *
+*
+* Proposed Observer Pattern Design Discussion
+* 
+*
+* First, we created an abstract class called ASubject which implements the subject component of the observer pattern. In this class, we created a vector which contains a list of pointers to entity observers. Then, we wrote the attach and detach methods which add and remove an observer from that vector. Finally, we added a notify method which iterates through the observers vector calling the OnEvent method for each observer in the vector.
+*
+*
+* Next, in delivery simulation, we filled in the implementation for the add and remove observer methods which add and remove IEntityObservers from the observer vector. 
+*
+*
+* Finally, in a class called package carrier which currently represents drones and robots, we implemented the notifications to the observers. In terms of the package, we created a notification when the package had been scheduled, picked up and was on route, or had been delivered. On the side of the package carrier (drones or robots), we created a notification when the package carrier was moving toward the customer, moving toward the package, or had entered an idle state because it ran out of battery. In the cases where the package carrier was moving, we also displayed the route it was following - either to the package or to the customer.
+*
+*
+* In order to implement the creation of these notifications, we created a new picojson::value eventValue object which was assigned to calling the create notification method with the type of message and the route in the cases where the package carrier is moving. Then, we called our notify function with the event value and a pointer to the package carrier (robot or drone) or the package. 
+*
+*
 */
