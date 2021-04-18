@@ -9,8 +9,6 @@
 #define CUSTOMER_H
 
 namespace csci3081 {
-
-
 /**
  * @brief The class to represent Customers in the simulation.
  * 

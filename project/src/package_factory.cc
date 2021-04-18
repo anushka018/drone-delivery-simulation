@@ -11,8 +11,8 @@ namespace csci3081 {
         if (JsonHelper::GetString(val, "type") == "package") {
             std::vector<float> position = JsonHelper::GetStdFloatVector(val, "position");
             std::vector<float> direction = JsonHelper::GetStdFloatVector(val, "direction");
-            bool contains = false;
 
+            bool contains = false;
             std::string name = "";
             contains = JsonHelper::ContainsKey(val, "name");
             if (contains) {
@@ -33,11 +33,8 @@ namespace csci3081 {
             if (contains) {
                 weight = (float) JsonHelper::GetDouble(val, "weight");
             }
-            
-            
             return new Package(position, direction, val, name, weight, speed, radius);
         }
         return nullptr;
     }
-
 }   // namespace csci3081

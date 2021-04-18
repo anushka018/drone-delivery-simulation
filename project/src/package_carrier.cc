@@ -100,7 +100,6 @@ void PackageCarrier::CarryPackage() {
         // Remove package from list of scheduled deliveries
         packages.erase(packages.begin());
         currentPackage = packages.at(0);
-        std::cout << "Path size: " << packagePath.size() << std::endl;
         // notify observers that package carrier is moving toward package
         eventVal = CreateNotification("moving", packagePath);
         Notify(eventVal, *this);

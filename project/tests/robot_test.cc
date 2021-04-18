@@ -454,7 +454,7 @@ namespace csci3081 {
        std::string packagePosition = "[" + X + "," + Y + "," + Z +"]";
 
 
-        // Check that the path passed to the notification contains the drone's starting position and package position
+        // Check that the path passed to the notification contains the robot's starting position and package position
         std::size_t found5 = output1.find(packagePosition);
         contains = found5 != std::string::npos;
         EXPECT_TRUE(contains);
@@ -483,7 +483,7 @@ namespace csci3081 {
         EXPECT_TRUE(contains);
         contains = found4 != std::string::npos;
         EXPECT_TRUE(contains);
-        // Check that path contains starting position of drone at the package pick-up spot
+        // Check that path contains starting position of robot at the package pick-up spot
         found5 = output1.find(packagePosition);
         contains = found5 != std::string::npos;
         EXPECT_TRUE(contains);

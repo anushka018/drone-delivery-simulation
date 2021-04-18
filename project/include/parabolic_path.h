@@ -4,9 +4,22 @@
 #define PARABOLIC_PATH_H
 
 namespace csci3081 {
-
+/**
+ * @brief This class contains the Parabolic route method used only on drones
+ * 
+ * @details Creates two parabolic paths and then merges them together to form a complete path for the package delivery. 
+ */
 class ParabolicPath : public PathStrategy {
     public:
+        /**
+         * @brief Create a Parabolic Path for the path attribute of the drone
+         * 
+         * @param[in] carrierPosition, float vector coordinate of the drone's origin
+         * @param[in] packagePosition, float vector coordinate of the package
+         * @param[in] customerPosition, float vector coordinate of the customer
+         * @param[in] graph, an IGraph* pointer to the simulation map. Not necessary for this implementation of CreatePath, the default value of null is used instead.
+         * @return std::vector < std::vector<float> > path for drone to follow in its update method
+         */
         std::vector < std::vector<float> > CreatePath(std::vector<float> carrierPosition, std::vector<float> packagePosition, 
                                                         std::vector<float> customerPosition, const IGraph* graph) override{
             std::vector < std::vector<float> > path = {};
@@ -49,6 +62,5 @@ class ParabolicPath : public PathStrategy {
             return path;
         }                           
 };
-
 }
 #endif // PARABOLIC_PATH_H
