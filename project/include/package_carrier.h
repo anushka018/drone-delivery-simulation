@@ -30,6 +30,7 @@ class PackageCarrier : public EntityBase {
     * @param[in] name of Drone
     * @param[in] speed in meters per second (default is 0.0)
     * @param[in] radius in meters (default is 1.0)
+    * @param[in] batteryCapacity in seconds (default is 10000)
     */
     PackageCarrier(std::vector<float> position, std::vector<float> direction,
             const picojson::object& details, const std::string name = "Default Package Carrier",
@@ -100,8 +101,6 @@ class PackageCarrier : public EntityBase {
     int pathIndex;
     bool hasPackage;
     bool firstTimeDead = false;
-
-
     /**
      * @brief Pick up and move the package along with the carrier.  
      * 

@@ -30,15 +30,12 @@ void DeliverySimulation::AddFactory(IEntityFactory* factory) {
 
 void DeliverySimulation::AddEntity(IEntity* entity) { 
   entities_.push_back(entity); // Add to vector of entitites for simulation
-  for (int i = 0; i < observers.size(); i++)
-  {
+  for (int i = 0; i < observers.size(); i++) {
 	EntityBase* entityBase = dynamic_cast<EntityBase*>(entity);
 	if(entityBase) {
-		entityBase->Attach(observers.at(i));
+		entityBase->Attach(observers.at(i)); // Attach existing observers to entity
 	}
-
   }
-  
 }
 
 void DeliverySimulation::SetGraph(const IGraph* graph) {
@@ -52,7 +49,6 @@ void DeliverySimulation::ScheduleDelivery(IEntity* package, IEntity* dest) {
 	Customer* customer = dynamic_cast<Customer*>(dest);
 	std::vector<PackageCarrier*> possibleCarriers;
 	PackageCarrier* carrier = nullptr;
-
 
 	int size = GetEntities().size();
 	for (int i = 0; i < size; i++) {
@@ -73,7 +69,6 @@ void DeliverySimulation::ScheduleDelivery(IEntity* package, IEntity* dest) {
 	else {
 		std::cout << "Delivery Failed; there are no drones or robots in simulation" << std::endl;
 	}
-	
 }
 
 void DeliverySimulation::AddObserver(IEntityObserver* observer) {
@@ -81,14 +76,12 @@ void DeliverySimulation::AddObserver(IEntityObserver* observer) {
 }
 
 void DeliverySimulation::RemoveObserver(IEntityObserver* observer) {
-	for (int i = 0; i < entities_.size(); i++)
-	{
+	for (int i = 0; i < entities_.size(); i++) {
 		EntityBase* entityBase = dynamic_cast<EntityBase*>(entities_.at(i));
 		if(entityBase) {
 			entityBase->Detach(observer);
 		}
 	}
-	
 	observers.erase(std::remove(observers.begin(), observers.end(), observer), observers.end()); 
 }
 
@@ -103,20 +96,15 @@ void DeliverySimulation::Update(float dt) {
 		}
 		Package* package = dynamic_cast <Package*>(entity);
 		if (package && package->GetIsDropped()) { 
-			// std::cout << "adding package to dropped package vector" << std::endl;
-			dropped_packages.push_back(package);
+			dropped_packages.push_back(package); 
 		}
 		if (dropped_packages.size() > 0) { 
-			for (int i = 0; i< dropped_packages.size(); i++) {
+			for (int i = 0; i < dropped_packages.size(); i++) {
 				ScheduleDelivery(dropped_packages.at(i), dropped_packages.at(i)->GetCustomer());
 				package->SetIsDropped(false);
 				dropped_packages.erase(dropped_packages.begin());
 			}
-	}
-		
-		//check to see if package
-		//run if statements to see if it is in new section of delivery
-		//send update of status to GetStatus() with new event and entity
+		}
 	}
 }
 

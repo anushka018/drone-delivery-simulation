@@ -30,13 +30,23 @@ class DeliveryScheduler {
     /**
      * @brief Establishes the necessary relationships and attributes of the entities to set-up and complete the delivery.
      * 
-     * @details 
+     * @details Calls CreatePath on the package carrier objects, using the strategy pattern to create different routes depending on the object's strategy.
      * 
      * @param[in] package: the Package entity to be delivered
-     * @param[in] carrier: Drone or Robot entity to complete delivery
-     * @param[in] dest: the Customer entity receiving the package
+     * @param[in] carriers: list of available Drones and Robots not currently delivering packages
+     * @param[in] customer: the Customer entity receiving the package
      */
     void ScheduleDelivery(Package* package, std::vector<PackageCarrier*> carriers, Customer* customer);
+ private:
+   /**
+    * @brief Reference to IGraph for creating smart routes on the proper web scene
+    * 
+    */
+    const IGraph* graph_;
+    /**
+     * @brief This integer index is used for even delivery distribution between the carriers if there are multiple deliveries
+     */
+    int nextCarrier;
     /**
      * @brief Find the closest Drone or Robot to the package for schedule delivery method
      * 
@@ -55,28 +65,6 @@ class DeliveryScheduler {
      * @param[in] Package* package for delivery
      */
     void StackDeliveries(PackageCarrier* carrier, Customer* customer, Package* package);
-    /**
-     * @brief Create the path along a smart route from the drone/robot to package to customer. 
-     *
-     * @see IGraph class for GetPath() method
-     * 
-     * @param[in] carrierPosition in float vector with coordinate points
-     * @param[in] packagePosition in float vector with coordinate points
-     * @param[in] customerPosition in float vector with coordinate points
-     * @return List of vector coordinate points for path from drone to customer
-     */
-    std::vector< std::vector<float> > CreatePath(std::vector<float> carrierPosition,
-                                                std::vector<float> packagePosition, std::vector<float> customerPosition);
- private:
-   /**
-    * @brief Reference to IGraph for creating smart routes on the proper web scene
-    * 
-    */
-    const IGraph* graph_;
-    /**
-     * @brief This integer index is used for even delivery distribution between the carriers if there are multiple deliveries
-     */
-    int nextCarrier;
 };
 
 } //    namespace csci3081

@@ -37,4 +37,11 @@ namespace csci3081 {
         destination = dest;
     }
 
+    void Package::SetIsDropped(bool isDropped_) { 
+        isDropped = isDropped_;
+    }
+    
+    bool Package::GetIsDropped(){
+        return isDropped;
+    }
 }   // namespace csci3081

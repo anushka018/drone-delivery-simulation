@@ -59,10 +59,19 @@ class Package : public EntityBase {
      * @param[in] dest Vector3D object representing coordinates of package's destination
      */
     void SetDestination(Vector3D dest);
-
-    void SetIsDropped(bool isDropped_) { isDropped = isDropped_ ;}
-
-    bool GetIsDropped() { return isDropped ;}
+   /**
+    * @brief Set the isDropped attribute of the package to true or false
+    * 
+    * @param[in] isDropped_, a boolean value 
+    */
+    void SetIsDropped(bool isDropped_);
+   /**
+    * @brief Get the boolean value of the isDropped attribute
+    * 
+    * @return true if the package has been dropped and needs to be rescheduled
+    * @return false if package is still being carried for delivery
+    */
+    bool GetIsDropped();
 
  private:
     Vector3D destination;
