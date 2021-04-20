@@ -1,0 +1,12 @@
+.DS_Store
+.dependencies
+.vscode
+.idea
+
+# Extensions to not include in repo
+*.o
+*.out
+*.pvt
+/docs/html*
+/docs/latex/*
+gitmessage.txt
