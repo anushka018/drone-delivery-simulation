@@ -32,9 +32,11 @@ class PackageCarrier : public EntityBase {
     * @param[in] radius in meters (default is 1.0)
     * @param[in] batteryCapacity in seconds (default is 10000)
     */
+    PackageCarrier();
     PackageCarrier(std::vector<float> position, std::vector<float> direction,
             const picojson::object& details, const std::string name = "Default Package Carrier",
-                float speed = 0.0, float radius = 1.0, float batteryCapacity = 10000.0); 
+                float speed = 0.0, float radius = 1.0, float batteryCapacity = 10000.0);
+                
     /**
      * @brief Moves the entity via Eulerian Integration with the given time interval dt
      * 

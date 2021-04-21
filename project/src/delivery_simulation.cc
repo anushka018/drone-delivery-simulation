@@ -45,6 +45,7 @@ void DeliverySimulation::SetGraph(const IGraph* graph) {
 
 void DeliverySimulation::ScheduleDelivery(IEntity* package, IEntity* dest) {
 	// Cast pointers of each entity type
+	std::cout << "Entered schedule delivery";
 	Package* pack = dynamic_cast<Package*>(package);
 	Customer* customer = dynamic_cast<Customer*>(dest);
 	std::vector<PackageCarrier*> possibleCarriers;

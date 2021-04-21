@@ -8,6 +8,8 @@
 #include <EntityProject/entity_factory.h>
 #include "entity_base.h"
 #include "json_helper.h"
+#include "carrier_decorator.h"
+#include "package_carrier.h"
 #include "drone.h"
 
 namespace csci3081 {
