@@ -20,9 +20,10 @@ namespace csci3081 {
 	    }
         PackageCarrier* carrier = FindClosestCarrier(Vector3D(package->GetPosition()), carriers);
         if (carrier) {
+            std::cout << "stacked" << std::endl;
             // Create path from drone/robot to package to customer
             std::vector< std::vector<float> > carrierPath = carrier->CreatePath(carrier->GetPosition(), package->GetPosition(), 
-                                                                                                    customerLocation, graph_);                                                                                      
+                                                                 customerLocation, graph_);                                                                                      
 		    carrier->SetPath(carrierPath); 
 		    carrier->AssignPackage(package);
         }

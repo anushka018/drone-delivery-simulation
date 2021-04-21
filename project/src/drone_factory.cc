@@ -24,7 +24,7 @@ namespace csci3081 {
             if (contains) {
                 radius = (float) JsonHelper::GetDouble(val, "radius"); 
             }
-            float speed = 0.0; 
+            float speed = 30.0; 
             contains = JsonHelper::ContainsKey(val, "speed");
             if (contains) {
                 speed = (float) JsonHelper::GetDouble(val, "speed");

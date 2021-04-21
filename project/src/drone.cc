@@ -5,7 +5,10 @@
 #include "drone.h"
 
 namespace csci3081 {
-
+Drone::Drone() {
+  type_ = "drone";
+  strategy = new SmartPath();
+}
 Drone::Drone(std::vector<float> position, std::vector<float> direction, 
                           const picojson::object& details, const std::string name, float speed, float radius,
                            float batteryCapacity, std::string pathStrategy) : 

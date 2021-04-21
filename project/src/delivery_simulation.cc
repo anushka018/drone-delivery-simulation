@@ -45,7 +45,6 @@ void DeliverySimulation::SetGraph(const IGraph* graph) {
 
 void DeliverySimulation::ScheduleDelivery(IEntity* package, IEntity* dest) {
 	// Cast pointers of each entity type
-	std::cout << "Entered schedule delivery";
 	Package* pack = dynamic_cast<Package*>(package);
 	Customer* customer = dynamic_cast<Customer*>(dest);
 	std::vector<PackageCarrier*> possibleCarriers;
@@ -93,6 +92,7 @@ void DeliverySimulation::Update(float dt) {
 	for (int i = 0; i < size; i++) {
 		EntityBase* entity = dynamic_cast<EntityBase*> (GetEntities().at(i));
 		if (entity->IsDynamic()) {
+			std::cout << "updating the decorator";
 			entity->Update(dt);
 		}
 		Package* package = dynamic_cast <Package*>(entity);
