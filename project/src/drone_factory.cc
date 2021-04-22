@@ -40,7 +40,7 @@ namespace csci3081 {
                 pathType = JsonHelper::GetString(val, "path");
             }
             picojson::object& modified = const_cast<picojson::object&>(val);
-            JsonHelper::AddStringToJsonObject(modified, "color","0x58ff3b");
+            // JsonHelper::AddStringToJsonObject(modified, "color","0x02bf17");
             Drone* drone = new Drone(position, direction, modified, name, speed, radius, batteryCapacity, pathType);
             return new DroneDecorator(drone);
         }
