@@ -15,6 +15,7 @@ PackageCarrier::PackageCarrier() : EntityBase() {
   currentPackage = nullptr;
   path = {};
 };
+
 PackageCarrier::PackageCarrier(std::vector<float> position, std::vector<float> direction, 
                           const picojson::object& details, const std::string name, float speed, float radius, float batteryCapacity) : 
                           EntityBase(details, position, direction, name, speed, radius) {

@@ -92,7 +92,6 @@ void DeliverySimulation::Update(float dt) {
 	for (int i = 0; i < size; i++) {
 		EntityBase* entity = dynamic_cast<EntityBase*> (GetEntities().at(i));
 		if (entity->IsDynamic()) {
-			std::cout << "updating the decorator";
 			entity->Update(dt);
 		}
 		Package* package = dynamic_cast <Package*>(entity);

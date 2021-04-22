@@ -42,19 +42,19 @@ class PackageCarrier : public EntityBase {
      * 
      * @param[in] dt time interval in seconds
      */
-    void Update(float dt) override;
+    virtual void Update(float dt) override;
     /**
      * @brief Get the route the package carrier is currently following for package delivery
      * 
      * @return a vector of (x,y,z) coordinate vectors that form a path avoiding buildings on the map
      */
-    std::vector< std::vector<float> > GetPath();
+    virtual std::vector< std::vector<float> > GetPath();
     /**
      * @brief Set the path for the carrier to follow for package delivery
      * 
      * @param[in] newPath: a list of vectors containing the float coordinate vectors of the path
      */
-    void SetPath(const std::vector< std::vector<float> >& newPath);
+    virtual void SetPath(const std::vector< std::vector<float> >& newPath);
     /**
      * @brief Create the path using the drone or robot's assigned path strategy
      * 
@@ -65,20 +65,20 @@ class PackageCarrier : public EntityBase {
      * 
      * @return std::vector< std::vector<float> >: a complete path for package carrier to follow from origin to package to customer
      */
-    std::vector< std::vector<float> > CreatePath(std::vector<float> carrierPosition, std::vector<float> packagePosition, 
+    virtual std::vector< std::vector<float> > CreatePath(std::vector<float> carrierPosition, std::vector<float> packagePosition, 
                                                         std::vector<float> customerPosition, const IGraph* graph = nullptr);
     /**
      * @brief Set the package pointer for the carrier
      * 
      * @param[in] package: the pointer to the package the drone is carrying
      */
-    void AssignPackage(Package* package);
+    virtual void AssignPackage(Package* package);
     /**
      * @brief Get the Battery of the carrier's engine
      * 
      * @return Battery* pointer to drone battery
      */
-    Battery* GetBattery();
+    virtual Battery* GetBattery();
     /**
      * @brief Creates a picojson object of type notification, loads the correct values for that type of notification, 
      * and converts the picojson object into a picojson value
@@ -87,7 +87,18 @@ class PackageCarrier : public EntityBase {
      * @param[in] path: optional parameter for drone/robot notifications
      * @return picojson::value with loaded values for observer notification
      */
-    picojson::value CreateNotification(std::string event, const std::vector< std::vector<float> >& path = {});
+    virtual picojson::value CreateNotification(std::string event, const std::vector< std::vector<float> >& path = {});
+    /**
+     * @brief Sets the direction of the package carrier to the given coordinate point
+     * 
+     * @details Overrides the SetDirection from the base class EntityBase. Takes in the new destination and checks
+     * if carrier is already at given destination. If so, the method does not change the package carrier's direction. Else, the direction is
+     * calculated using Vector math: direction = destination - position. Finally, the direction is normalized before being set
+     * as the carrier's new direction for movement. 
+     * 
+     * @param[in] destination vector with (x,y,z) float coordinates
+     */
+    void SetDirection(const std::vector<float>& dest) override;
     /**
      * @brief Destroy the carrier object and its dynamically allocated battery
      * 
@@ -109,17 +120,6 @@ class PackageCarrier : public EntityBase {
      * @details Sets the position and direction of the package to the carrier's to match the movement. 
      */
     void CarryPackage();
-    /**
-     * @brief Sets the direction of the package carrier to the given coordinate point
-     * 
-     * @details Overrides the SetDirection from the base class EntityBase. Takes in the new destination and checks
-     * if carrier is already at given destination. If so, the method does not change the package carrier's direction. Else, the direction is
-     * calculated using Vector math: direction = destination - position. Finally, the direction is normalized before being set
-     * as the carrier's new direction for movement. 
-     * 
-     * @param[in] destination vector with (x,y,z) float coordinates
-     */
-    void SetDirection(const std::vector<float>& dest) override;
     /**
      * @brief Get the path from the previous package's destination to the next scheduled package
      * 

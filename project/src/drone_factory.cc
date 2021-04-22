@@ -42,7 +42,7 @@ namespace csci3081 {
             picojson::object& modified = const_cast<picojson::object&>(val);
             JsonHelper::AddStringToJsonObject(modified, "color","0x58ff3b");
             Drone* drone = new Drone(position, direction, modified, name, speed, radius, batteryCapacity, pathType);
-            return new CarrierDecorator(drone);
+            return new DroneDecorator(drone);
         }
         return nullptr;
     }
