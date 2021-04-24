@@ -262,7 +262,7 @@
 *
 *
 *
-* Proposed Observer Pattern Design Discussion
+* Observer Pattern Design Discussion
 * 
 *
 * First, we created an abstract class called ASubject which implements the subject component of the observer pattern. In this class, we created a vector which contains a list of pointers to entity observers. Then, we wrote the attach and detach methods which add and remove an observer from that vector. Finally, we added a notify method which iterates through the observers vector calling the OnEvent method for each observer in the vector.
@@ -277,4 +277,6 @@
 * In order to implement the creation of these notifications, we created a new picojson::value eventValue object which was assigned to calling the create notification method with the type of message and the route in the cases where the package carrier is moving. Then, we called our notify function with the event value and a pointer to the package carrier (robot or drone) or the package. 
 *
 *
+* Drone Battery Life Decorator Feature Discussion
+*  
 */
