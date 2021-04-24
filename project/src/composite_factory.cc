@@ -32,7 +32,6 @@ namespace csci3081 {
         for (IEntityFactory* factory : factories) {
             delete factory;
         }
-        factories.clear();
     }
 
 }   // namespace csci3081

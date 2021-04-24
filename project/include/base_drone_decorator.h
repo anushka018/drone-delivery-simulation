@@ -1,22 +1,33 @@
 /**
- * @file drone_decorator.h
+ * @file base_drone_decorator.h
  */
-#ifndef DRONE_DECORATOR_H
-#define DRONE_DECORATOR_H
+#ifndef BASE_DRONE_DECORATOR_H
+#define BASE_DRONE_DECORATOR_H
 
-#include "drone_decorator.h"
 #include "drone.h"
+#include "package_carrier.h"
+#include "path_strategy.h"
 
 namespace csci3081 {
 /**
  * @brief Drone Decorator Class
  * 
  */
-class DroneDecorator : public Drone { 
+class BaseDroneDecorator : public PackageCarrier { 
     protected:
-        Drone* drone_;
+        PackageCarrier* drone_;
     public:
-        DroneDecorator(Drone* drone);
+        BaseDroneDecorator(PackageCarrier* drone) {
+            drone_ = drone;
+        };
+
+        /**
+        virtual ~BaseDroneDecorator() {
+            // delete drone_;
+        };
+        **/
+
+        virtual void Update(float dt) override { drone_->Update(dt); }
 
         void Attach(IEntityObserver* observer) { drone_->Attach(observer); }
 	
@@ -50,8 +61,6 @@ class DroneDecorator : public Drone {
 
         bool IsDynamic() const { return drone_->IsDynamic(); }
 
-        void Update(float dt);
-
         std::vector< std::vector<float> > GetPath() {return drone_->GetPath();}
 
         void SetPath(const std::vector< std::vector<float> >& newPath) {drone_->SetPath(newPath);}
@@ -67,6 +76,8 @@ class DroneDecorator : public Drone {
         Battery* GetBattery() {return drone_->GetBattery();}
 
         picojson::value CreateNotification(std::string event, const std::vector< std::vector<float> >& path = {}) {return drone_->CreateNotification(event, path);}
+
+        unsigned int rgb(double ratio);
     
 };
 }

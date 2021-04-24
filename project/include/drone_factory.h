@@ -8,7 +8,7 @@
 #include <EntityProject/entity_factory.h>
 #include "entity_base.h"
 #include "json_helper.h"
-#include "drone_decorator.h"
+#include "battery_drone_decorator.h"
 #include "package_carrier.h"
 #include "drone.h"
 

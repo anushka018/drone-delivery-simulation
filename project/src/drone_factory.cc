@@ -41,8 +41,8 @@ namespace csci3081 {
             }
             picojson::object& modified = const_cast<picojson::object&>(val);
             // JsonHelper::AddStringToJsonObject(modified, "color","0x02bf17");
-            Drone* drone = new Drone(position, direction, modified, name, speed, radius, batteryCapacity, pathType);
-            return new DroneDecorator(drone);
+            PackageCarrier* drone = new Drone(position, direction, modified, name, speed, radius, batteryCapacity, pathType);
+            return new BatteryDroneDecorator(drone);
         }
         return nullptr;
     }
