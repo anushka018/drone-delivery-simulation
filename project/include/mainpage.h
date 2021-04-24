@@ -288,17 +288,27 @@
 * 
 * Generic Decorator Pattern UML
 * 
+* ![Decorator Pattern UML](../images/DecoratorPattern.png)
+* 
+* 
 * 
 * 
 * Battery Life Drone Decorator Pattern UML
 *
-* 
+* ![Drone Battery Life Decorator Pattern UML](../images/DroneDecoratorPattern.png)
 *
+*
+*
+* 
 * Within the new drone decorator class, we stored an instance of a Drone* in order to utilize the composition required for the decorator pattern. Since the drone decorator class inherits from package carrier, we needed to include declarations of that parent classes method which was done through the stored Drone*. This pointer was used in each of the function bodies to call their appropriate methods from the package carrier class using the arrow operator for pointer dereferencing( ->).  The only exception to these definitions was in the update function for the drone decorator class. In, the update function, the Drone* update function was called. Decorating of the drone entities color was also implemented as well. This was done through a series of if-else branches. First, the drone’s current battery was found. Next, a reference to the picojson drone object was stored to be modified. Within each of the if-else statements, the current battery value of the drone was compared against values for battery level ranges corresponding to different colors. We had 6 different colors to represent the color of the drone’s battery life. The ranges for each of these values was determined by splitting them equiavl;ently amongst the range 0 - 10,000 where 10,000 is the battery’s maximum capacity. Please refer to the image below to view the 6 colors along with their hex values and the breakdown for each of the ranges of battery life. 
 * 
 *
 * Drone Decorator Battery Life Color Breakdown
 * 
+*  
+* ![Battery Life Color Breakdown](../images/BatteryLifeColorBreakdown.png)
+* 
+*
 *
 * In addition, within the constructor for the drone decorator class, a preference to the class Droine* member variable was stored.  
 * 
