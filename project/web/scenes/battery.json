@@ -7,7 +7,7 @@
             "name": "drone",
       	    "mesh": "models/s9drone.glb",
             "position": [498.292, 253.883, -228.623],
-            "battery_capacity": 5010.0,
+            "battery_capacity": 85.0,
       	    "scale": [0.1, 0.1, 0.1],
       	    "rotation": [0, 0, 0, 0],
             "direction": [1,0,0],

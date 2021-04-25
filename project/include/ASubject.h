@@ -38,7 +38,6 @@ public:
 	virtual void Detach(IEntityObserver* observer){
 		observers.erase(std::remove(observers.begin(), observers.end(), observer), observers.end());
 	}
-
 	/** 
      * @brief iterates through the observers vector calling the OnEvent method for each observer in the vector
      * 
