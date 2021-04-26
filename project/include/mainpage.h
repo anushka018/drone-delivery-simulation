@@ -283,6 +283,8 @@
 *
 * Our team chose to utilize the decorator pattern to implement a decorator for drones based on their battery life. The decorator pattern is useful because it allows for the addition of new features to objects in an existing system without the need to modify its underlying structure. These behaviors are added dynamically and can be modified at any point which allows for much greater flexibility. It also prevents code redundancy by allowing us to utilize composition rather than inheritance. In the case of using inheritance to implement new features, an entirely new object would need to be created. Finally, the decorator pattern allows our code to adhere to the single responsibility principle and the open/closed principle following good software design practices.
 * 
+* Scene files that the feature works on: 
+* 
 * In order to implement the decorator pattern, you must create a child class of the abstract component class which will serve as the decorator interface. Then, In this abstract class, you must add a pointer to the abstract component class as a private instance variable to utilize composition. In addition, you must initialize this pointer and forward all methods to it. Finally, a concrete decorator class must be created which inherits from the abstract decorator class. In this class, you need to override any methods from the component abstract class that you would like to modify using the decorator pattern.  
 * 
 * 
