@@ -11,9 +11,11 @@ DeliverySimulation::DeliverySimulation() {
 }
 
 DeliverySimulation::~DeliverySimulation() {
+	/**
 	for (IEntity* entity : entities_) {
 		delete entity;
 	}
+	**/
 	delete entityFactory;
 	delete map;
 	delete scheduler;
@@ -78,7 +80,7 @@ void DeliverySimulation::AddObserver(IEntityObserver* observer) {
 void DeliverySimulation::RemoveObserver(IEntityObserver* observer) {
 	for (int i = 0; i < entities_.size(); i++) {
 		EntityBase* entityBase = dynamic_cast<EntityBase*>(entities_.at(i));
-		if(entityBase) {
+		if (entityBase) {
 			entityBase->Detach(observer);
 		}
 	}
