@@ -3,6 +3,7 @@
  * @author Audrey Kelly
  */
 #include "drone_factory.h"
+#include "picojson.h"
 
 namespace csci3081 { 
     DroneFactory::DroneFactory() {};
@@ -23,7 +24,7 @@ namespace csci3081 {
             if (contains) {
                 radius = (float) JsonHelper::GetDouble(val, "radius"); 
             }
-            float speed = 0.0; 
+            float speed = 30.0; 
             contains = JsonHelper::ContainsKey(val, "speed");
             if (contains) {
                 speed = (float) JsonHelper::GetDouble(val, "speed");
@@ -38,7 +39,10 @@ namespace csci3081 {
             if (contains) {
                 pathType = JsonHelper::GetString(val, "path");
             }
-            return new Drone(position, direction, val, name, speed, radius, batteryCapacity, pathType);
+            picojson::object& modified = const_cast<picojson::object&>(val);
+            // JsonHelper::AddStringToJsonObject(modified, "color","0x02bf17");
+            PackageCarrier* drone = new Drone(position, direction, modified, name, speed, radius, batteryCapacity, pathType);
+            return new BatteryDroneDecorator(drone);
         }
         return nullptr;
     }

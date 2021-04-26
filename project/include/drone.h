@@ -36,6 +36,7 @@ class Drone : public PackageCarrier {
     * @param[in] batteryCapacity in seconds (default is 10000)
     * @param[in] pathStrategy in a string (default is "smart")
     */
+    Drone();
     Drone(std::vector<float> position, std::vector<float> direction,
             const picojson::object& details, const std::string name = "Default Drone",
                 float speed = 0.0, float radius = 1.0, float batteryCapacity = 10000.0, std::string pathStrategy = "smart"); 

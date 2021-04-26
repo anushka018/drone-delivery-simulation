@@ -8,6 +8,13 @@
 #include <json_helper.h>
 
 namespace csci3081 {
+PackageCarrier::PackageCarrier() : EntityBase() {
+  battery = new Battery();
+  pathIndex = 0;
+  hasPackage = false;
+  currentPackage = nullptr;
+  path = {};
+};
 
 PackageCarrier::PackageCarrier(std::vector<float> position, std::vector<float> direction, 
                           const picojson::object& details, const std::string name, float speed, float radius, float batteryCapacity) : 
@@ -19,6 +26,7 @@ PackageCarrier::PackageCarrier(std::vector<float> position, std::vector<float> d
   currentPackage = nullptr;
   path = {};
 }
+
 
 void PackageCarrier::Update(float dt) {
   // find segment of path from package to customer

@@ -8,6 +8,9 @@ namespace csci3081 {
 
     int EntityBase::entityCount = 0;
 
+    EntityBase::EntityBase() {
+    };
+
     EntityBase::EntityBase(const picojson::object& details, std::vector<float> position,
                             std::vector<float> direction, const std::string name,
                                 float speed, float radius) {

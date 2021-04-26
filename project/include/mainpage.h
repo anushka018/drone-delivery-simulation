@@ -262,7 +262,7 @@
 *
 *
 *
-* Proposed Observer Pattern Design Discussion
+* Observer Pattern Design Discussion
 * 
 *
 * First, we created an abstract class called ASubject which implements the subject component of the observer pattern. In this class, we created a vector which contains a list of pointers to entity observers. Then, we wrote the attach and detach methods which add and remove an observer from that vector. Finally, we added a notify method which iterates through the observers vector calling the OnEvent method for each observer in the vector.
@@ -276,5 +276,91 @@
 *
 * In order to implement the creation of these notifications, we created a new picojson::value eventValue object which was assigned to calling the create notification method with the type of message and the route in the cases where the package carrier is moving. Then, we called our notify function with the event value and a pointer to the package carrier (robot or drone) or the package. 
 *
+*
+*
+*
+* Drone Battery Life Decorator Feature Discussion
+*
+* Our team chose to utilize the decorator pattern to implement a decorator for drones based on their battery life. The decorator pattern is useful because it allows for the addition of new features to objects in an existing system without the need to modify its underlying structure. These behaviors are added dynamically and can be modified at any point which allows for much greater flexibility. It also prevents code redundancy by allowing us to utilize composition rather than inheritance. In the case of using inheritance to implement new features, an entirely new object would need to be created. Finally, the decorator pattern allows our code to adhere to the single responsibility principle and the open/closed principle following good software design practices.
+* 
+* Scene files that the feature works on: This feature should work on all scene files but we recommend running the scene we created called battery.json in order to see the full range of battery life colors
+* 
+* In order to implement the decorator pattern, you must create a child class of the abstract component class which will serve as the decorator interface. Then, In this abstract class, you must add a pointer to the abstract component class as a private instance variable to utilize composition. In addition, you must initialize this pointer and forward all methods to it. Finally, a concrete decorator class must be created which inherits from the abstract decorator class. In this class, you need to override any methods from the component abstract class that you would like to modify using the decorator pattern.  
+* 
+* 
+* Generic Decorator Pattern UML
+* 
+* ![Decorator Pattern UML](../images/DecoratorPattern.png)
+* 
+* 
+*
+* For our implementation of the decorator pattern, we created a base drone decorator class which inherits from our package carrier class for drones and robots. This, in turn, is a subclass of entity base which is the base class for the abstract IEntity interface.  We also created a concrete battery drone decorator class which inherited from the abstract base drone decorator class.
+*
+* 
+* Battery Life Drone Decorator Pattern UML
+*
+* ![Drone Battery Life Decorator Pattern UML](../images/DroneDecoratorPattern.png)
+*
+*
+*
+* 
+* Within the new base drone decorator class, we stored an instance of a PackageCarrier* in order to utilize the composition required for the decorator pattern. Since the base drone decorator class inherits from package carrier, we needed to include declarations of that parent classes methods which was done through the stored PackageCarrier*. This pointer was used in each of the function bodies to call their appropriate methods from the package carrier class using the arrow operator for pointer dereferencing( ->).  All methods from the EntityBase, ASubject, and Package Carrier classes were overridden in this manner. The only exception to these definitions was in the update function for the drone decorator class. In, the update function, the PackageCarrier* update function was called. 
+* 
+* Decorating of the drone entities color was also implemented as well. This was done in a battery drone decorator class which inherited from the base drone decorator class. This class also contained a PackageCarrier* member variables which we initialized in the battery drone decorator class’s constructor by calling its parent classes constructor -  the base drone decorator classes in our case. We then overrode the virtual update method defined in the abstract base drone decorator class. Within this update function, we decorated the color of the drone through a series of if-else branches. First, the drone’s current battery was found. Next, a reference to the picojson drone object was stored to be modified. Within each of the if-else statements, the current battery value of the drone was compared against values for battery level ranges corresponding to different colors. We had 6 different colors to represent the color of the drone’s battery life. The ranges for each of these values was determined by splitting them equivalently amongst the range 0 - 10,000 where 10,000 is the battery’s maximum capacity. Please refer to the image below to view the 6 colors along with their hex values and the breakdown for each of the ranges of battery life. 
+*
+* Drone Decorator Battery Life Color Breakdown
+* 
+*  
+* ![Battery Life Color Breakdown](../images/BatteryLifeColorBreakdown.png)
+* 
+*
+*
+* In addition, within the constructor for the drone decorator class, a preference to the class PackageCarrier* member variable was stored.  
+* 
+* Finally, during the instantiation of a new drone object in drone factory, we created a new drone as a PackageCarrier* by calling our drone constructor. Then, we returned an instance of our battery drone decorator class. This was done using using the PackageCarrier* in the constructor of the drone decorator class. 
+*
+*
+* PackageCarrier* drone = new Drone(position, direction, modified, name, speed, radius, batteryCapacity, pathType);
+* return new BatteryDroneDecorator(drone);
+* 
+* 
+* Difficulties & Tips/Advice 
+* 
+* 
+* The most challenging part about implementing the decorator pattern for the drone’s battery life was understanding how to implement the inheritance structure as well as determining how to change the color value of the drone entity in the simulation by modifying its picojson values. Originally, our drone decorator class inherited from the drone class directly, but then we modified the inheritance structure so that it inherited from the package carrier class to more closely resemble the class structure of the decorator pattern. Another aspect of the decorator pattern that was confusing was that we needed to redefine all the methods in the drone decorator class which inherits from the package carrier class. It was slightly confusing at first that this needed to be done and also that it must be done using the Drone* in our drone decorator class and the arrow operator for pointer dereferencing. Finally, the other major difficulty was updating the color or the drone entity in the simulation. This was confusing because we were unsure how to interact with the front end support code to modify the hexadecimal color value of the drone in the simulation. At first, after looking at the json configuration files and seeing color as a parameter, we thought we may have needed to modify the json files directly. However, we got a lot more clarity once we realized we could use the update string value function from the json helper class. This made things much easier as we could directly set the color attribute of our drone entities using a hexadecimal color value as a string. 
+*
+*
+* Some resources that really helped along the way were the slides on color coding entities, the decorator pattern example posted by a TA, the head first design textbook, and the class lecture posted on the decorator pattern. The slide on color coding entities helped clarify that we must set the color using the syntax: 
+* 
+* 
+* details_["color"] = picojson::value("0x0000ff"); // where 0x... is the color
+* 
+* It also made us aware of the fact that we must invoke the observer in order for the record to change. This slide is titled “Color coding your entities” and can be found in the adapter pattern lecture linked below.
+* 
+* The example posted by the TA was extremely useful in helping us understand how the inheritance structure worked for the decorator pattern, especially because it provided an example that related more closely with the context of this project. Finally, some helpful resources for understanding the decorator pattern are linked below as well. 
+*
+*
+* Links to resources mentioned above
+* 
+* 
+* 1. Slideshow with slide on adding color to entities: https://canvas.umn.edu/courses/217398/files/20874077?module_item_id=5928287 
+*
+* 2. Decorator pattern inheritance structure example: https://canvas.umn.edu/courses/217398/files/20956519?module_item_id=5939856 
+*
+* 
+*
+* Understanding the decorator pattern
+* 
+* 
+* 1. Head First Design Patterns Textbook from the UMN Library: https://primo.lib.umn.edu/primo-explore/search?query=any,contains,head%20first%20design%20patterns&search_scope=mncat_discovery&vid=TWINCITIES&lang=en_US 
+*
+* 2. Lecture on the decorator pattern: https://canvas.umn.edu/courses/217398/external_tools/24 
+*
+* 3. Slides on the decorator pattern: https://canvas.umn.edu/courses/217398/files/20650005?module_item_id=5897942 
+* 
+* 4. Decorator pattern example from Tutorials Point: https://www.tutorialspoint.com/design_pattern/decorator_pattern.htm
+*
+* 5. Decorator pattern Youtube video with code example: https://www.youtube.com/watch?v=j40kRwSm4VE 
+* 
 *
 */
