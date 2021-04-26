@@ -293,7 +293,9 @@
 * ![Decorator Pattern UML](../images/DecoratorPattern.png)
 * 
 * 
-* 
+*
+* For our implementation of the decorator pattern, we created a base drone decorator class which inherits from our package carrier class for drones and robots. This, in turn, is a subclass of entity base which is the base class for the abstract IEntity interface.  We also created a concrete battery drone decorator class which inherited from the abstract base drone decorator class.
+*
 * 
 * Battery Life Drone Decorator Pattern UML
 *
@@ -302,8 +304,9 @@
 *
 *
 * 
-* Within the new drone decorator class, we stored an instance of a Drone* in order to utilize the composition required for the decorator pattern. Since the drone decorator class inherits from package carrier, we needed to include declarations of that parent classes method which was done through the stored Drone*. This pointer was used in each of the function bodies to call their appropriate methods from the package carrier class using the arrow operator for pointer dereferencing( ->).  The only exception to these definitions was in the update function for the drone decorator class. In, the update function, the Drone* update function was called. Decorating of the drone entities color was also implemented as well. This was done through a series of if-else branches. First, the drone’s current battery was found. Next, a reference to the picojson drone object was stored to be modified. Within each of the if-else statements, the current battery value of the drone was compared against values for battery level ranges corresponding to different colors. We had 6 different colors to represent the color of the drone’s battery life. The ranges for each of these values was determined by splitting them equiavl;ently amongst the range 0 - 10,000 where 10,000 is the battery’s maximum capacity. Please refer to the image below to view the 6 colors along with their hex values and the breakdown for each of the ranges of battery life. 
+* Within the new base drone decorator class, we stored an instance of a PackageCarrier* in order to utilize the composition required for the decorator pattern. Since the base drone decorator class inherits from package carrier, we needed to include declarations of that parent classes methods which was done through the stored PackageCarrier*. This pointer was used in each of the function bodies to call their appropriate methods from the package carrier class using the arrow operator for pointer dereferencing( ->).  All methods from the EntityBase, ASubject, and Package Carrier classes were overridden in this manner. The only exception to these definitions was in the update function for the drone decorator class. In, the update function, the PackageCarrier* update function was called. 
 * 
+* Decorating of the drone entities color was also implemented as well. This was done in a battery drone decorator class which inherited from the base drone decorator class. This class also contained a PackageCarrier* member variables which we initialized in the battery drone decorator class’s constructor by calling its parent classes constructor -  the base drone decorator classes in our case. We then overrode the virtual update method defined in the abstract base drone decorator class. Within this update function, we decorated the color of the drone through a series of if-else branches. First, the drone’s current battery was found. Next, a reference to the picojson drone object was stored to be modified. Within each of the if-else statements, the current battery value of the drone was compared against values for battery level ranges corresponding to different colors. We had 6 different colors to represent the color of the drone’s battery life. The ranges for each of these values was determined by splitting them equivalently amongst the range 0 - 10,000 where 10,000 is the battery’s maximum capacity. Please refer to the image below to view the 6 colors along with their hex values and the breakdown for each of the ranges of battery life. 
 *
 * Drone Decorator Battery Life Color Breakdown
 * 
@@ -312,13 +315,13 @@
 * 
 *
 *
-* In addition, within the constructor for the drone decorator class, a preference to the class Droine* member variable was stored.  
+* In addition, within the constructor for the drone decorator class, a preference to the class PackageCarrier* member variable was stored.  
 * 
-* Finally, during the instantiation of a new drone object in drone factory, we created a new drone as a Drone*. Then, we returned an instance of our drone decorator class. This was done using using the Drone* in the constructor of the drone decorator class. 
+* Finally, during the instantiation of a new drone object in drone factory, we created a new drone as a PackageCarrier* by calling our drone constructor. Then, we returned an instance of our battery drone decorator class. This was done using using the PackageCarrier* in the constructor of the drone decorator class. 
 *
 *
-* Drone* drone = new Drone(position, direction, modified, name, speed, radius, batteryCapacity, pathType);
-* return new DroneDecorator(drone);
+* PackageCarrier* drone = new Drone(position, direction, modified, name, speed, radius, batteryCapacity, pathType);
+* return new BatteryDroneDecorator(drone);
 * 
 * 
 * Difficulties & Tips/Advice 
