@@ -363,4 +363,26 @@
 * 5. Decorator pattern Youtube video with code example: https://www.youtube.com/watch?v=j40kRwSm4VE 
 * 
 *
+*
+* Team Documentation for Iteration 3
+*
+* 
+* Tuesday, April 20th
+*
+*
+* Today was the first day that we met to discuss the final iteration. Before we could begin any coding or delegating, we discussed which feature we wanted to implement. We decided that the best option for our group would be adding the entity color decorator feature. After deciding this, Audrey used a whiteboard near her to draw out potential UML for this feature. While drawing out this UML, we were also brainstorming in general, ways that we could potentially implement this feature. One idea that was shared was creating a json attribute for color. In order to do this we considered changing the factory pattern to add a color attribute to the entities. Towards the end of the meeting we felt like we needed a bit more clarity before beginning, so we constructed a Piazza post, asking for more information about color and json attributes/objects. Before parting for the day, we planned future meetings to continue working on the project. We loosely split up the tasks left for the iteration, documentation, write up, code, and tests to Lara, Anushka, Audrey, and Anoushka respectively. 
+* 
+*
+* Saturday, April 24th
+* 
+*
+* Today we spent a majority of our time together going through the code to find what might be causing segmentation faults or aborts when running the simulation. After creating a copy of a scene to test the drone’s coloring, we ran into some seg faults that kept coming up so we shifted our focus to working through that. At first we tried to change the initialization of the base and battery decorator drones, but the errors persisted. We then backtracked through our code to try to understand where we were freeing memory or accessing it, to see if there was a place that we were missing a free or allocating too many times. This led to us deleting code in the delivery simulation that deleted the entities, and fixed the errors that we were getting. While we are a bit unsure as to why this didn’t throw any errors in the earlier iterations, we feel comfortable that our code is now working properly. After fixing this problem we tested our project on several different scenes and got it to work for all of them. All that is left now is documentation and the tests which we will finish as a team over the next week or so. 
+* 
+*
+* Monday, April 26th
+* 
+*
+* Today we started by checking in with each other and talking about vaccinations before jumping into the project. After figuring out what we have left to complete, we started working on the tests. We first talked about how we wanted to go about the tests, creating a drone and using EXPECT_EQ to check the various colors the drone should be at depending on the battery life. We then started implementing this, using json helper functions and details to access the color of the drone. There was a slight difference between the branch we were working on and the most recent version, so we spent some time figuring out which branch we should merge and pull from to get the correct version. After fixing the branch issue we started to work through the errors that came through making the test such as updating the variable names to be consistent with recent changes, adding the correct headers, and changing the hex color codes to the correct values. We were able to get the code to compile, but ran into seg faults when running them. To try to see if the tests we just made were working correctly, we commented out the observer tests, as there is most likely some work that needs to be done in there which could be causing the seg fault. Unfortunately, we still ran into a seg fault after commenting out the observer test and quickly realized it was because the drone was not fully initialized before calling update. So after adding a path and package to the drone, we were able to get the tests to work. We then moved onto the rest of the tests that checked to see that the correct colors were showing up for the correct ranges. To do this we used DecreaseCharge from the Battery class to change the battery life values of the drones, and then checking to see what the color value is for them. Before heading out for the day we talked about working on the observer test for the next meeting. 
+*
+*
 */
