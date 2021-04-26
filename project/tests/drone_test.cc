@@ -7,6 +7,7 @@
 #include <EntityProject/entity.h>
 #include "json_helper.h"
 #include "drone.h"
+#include "battery_drone_decorator.h"
 
 namespace csci3081 {
     class DroneTest : public ::testing::Test {
@@ -421,7 +422,7 @@ namespace csci3081 {
         system->AddEntity(droneEntity);
         system->AddEntity(packageEntity);
         system->AddEntity(customerEntity);
-        Drone* drone = dynamic_cast<Drone*>(droneEntity);
+        BatteryDroneDecorator* drone = dynamic_cast<BatteryDroneDecorator*>(droneEntity);
         drone->SetSpeed(30.0);
         Package* package = dynamic_cast<Package*>(packageEntity);
         float dt = 0.01;
@@ -525,7 +526,7 @@ namespace csci3081 {
         EXPECT_TRUE(contains);
         contains = found4 != std::string::npos;
         EXPECT_TRUE(contains);     
-    }
+    } 
    
     TEST_F(DroneTest, SetGetPath) {
         Drone drone = Drone(position, direction, droneObj);
@@ -562,6 +563,67 @@ namespace csci3081 {
                 EXPECT_EQ(drone.GetPath().at(i).at(j), newerPath.at(i).at(j));
             }
         }
+    }
+
+    //checking for the proper Decorator pattern changes for the drone
+    TEST_F(DroneTest, DroneDecorator) { 
+        int batteryCapacity = 10000; 
+        std::string name = "drone";
+        double speed = 10.0;
+        double radius = 1.0;
+        float dt = 0.1; 
+        //instantiate DroneDecorator 
+        picojson::object& modifiedDroneObj = const_cast<picojson::object&>(droneObj);
+        JsonHelper::AddStringToJsonObject(modifiedDroneObj, "color", "0x02BF17" );
+        PackageCarrier* drone = new Drone(position, direction, modifiedDroneObj, name, speed ,radius, batteryCapacity);
+        BatteryDroneDecorator* droneDecorator = new BatteryDroneDecorator(drone);
+        drone->SetPath(path);
+        Package* package = new Package(position, direction, packageObj);
+        drone->AssignPackage(package);
+        droneDecorator->Update(dt);
+        picojson::object& colorDetails= const_cast<picojson::object&> (droneDecorator->GetDetails()); 
+        EXPECT_EQ( "0x02bf17" , JsonHelper::GetString(colorDetails, "color"));
+
+        //check if the correct colors show up for the correct ranges 
+        droneDecorator->GetBattery()->DecreaseCharge(1700); 
+        droneDecorator->Update(dt);
+        colorDetails= const_cast<picojson::object&> (droneDecorator->GetDetails()); 
+        EXPECT_EQ("0x39ffa7", JsonHelper::GetString(colorDetails, "color"));
+
+        droneDecorator->GetBattery()->DecreaseCharge(1700); 
+        droneDecorator->Update(dt);
+        colorDetails= const_cast<picojson::object&> (droneDecorator->GetDetails()); 
+        EXPECT_EQ("0xfff229", JsonHelper::GetString(colorDetails, "color"));
+
+        droneDecorator->GetBattery()->DecreaseCharge(1700); 
+        droneDecorator->Update(dt);
+        colorDetails= const_cast<picojson::object&> (droneDecorator->GetDetails()); 
+        EXPECT_EQ("0xffc01f", JsonHelper::GetString(colorDetails, "color"));
+
+        droneDecorator->GetBattery()->DecreaseCharge(1700); 
+        droneDecorator->Update(dt);
+        colorDetails= const_cast<picojson::object&> (droneDecorator->GetDetails()); 
+        EXPECT_EQ("0xff5a1f", JsonHelper::GetString(colorDetails, "color"));
+
+        droneDecorator->GetBattery()->DecreaseCharge(1700); 
+        droneDecorator->Update(dt);
+        colorDetails= const_cast<picojson::object&> (droneDecorator->GetDetails()); 
+        EXPECT_EQ("0x8a2703", JsonHelper::GetString(colorDetails, "color"));
+
+        droneDecorator->GetBattery()->DecreaseCharge(1700); 
+        droneDecorator->Update(dt);
+        colorDetails= const_cast<picojson::object&> (droneDecorator->GetDetails()); 
+        EXPECT_EQ("0x8a2703", JsonHelper::GetString(colorDetails, "color"));
+        
+        
+
+        //check if the observer notif correct shows up??? not sure if that one goes in the oberver test or not 
+
+        // 
+
+
+
+
     }
 }
 

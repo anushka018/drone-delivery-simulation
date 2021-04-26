@@ -6,7 +6,7 @@
 #include "../include/delivery_simulation.h"
 #include <EntityProject/entity.h>
 #include "json_helper.h"
-#include "Robot.h"
+#include "robot.h"
 
 namespace csci3081 {
     class RobotTest : public ::testing::Test {
