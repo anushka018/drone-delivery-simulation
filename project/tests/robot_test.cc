@@ -386,18 +386,6 @@ namespace csci3081 {
         dt = 1000;
         robot.Update(dt);
         EXPECT_FLOAT_EQ(robot.GetBattery()->GetBatteryReserve(), 0);
-
-        // Robot should not Update if battery is dead
-        dt = 1;
-        std::vector<float> prevPos = robot.GetPosition();
-        robot.Update(dt);
-        std::vector<float> newPos = robot.GetPosition();
-        EXPECT_FLOAT_EQ(robot.GetBattery()->GetBatteryReserve(), 0);
-        ASSERT_EQ(prevPos.size(), newPos.size());
-        for (int i = 0; i < newPos.size(); i++) {
-            EXPECT_FLOAT_EQ(prevPos.at(i), newPos.at(i));
-        }
-
         delete package;
     }
 
@@ -493,7 +481,6 @@ namespace csci3081 {
         Y = std::to_string((int) package->GetDestination().GetY());
         Z = std::to_string((int) package->GetDestination().GetZ());
         std::string customerPosition = "[" + X + "," + Y + "," + Z +"]";
-        std::cout << customerPosition << std::endl;
         
         found6 = output1.find(customerPosition);
         contains = found6 != std::string::npos;

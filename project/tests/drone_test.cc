@@ -35,7 +35,7 @@ namespace csci3081 {
                 JsonHelper::AddStdFloatVectorToJsonObject(customerObj, "position", customerPosition);
                 JsonHelper::AddStdFloatVectorToJsonObject(customerObj, "direction", direction);
 
-                path = {{2,0,0},{0,2,0},{5,4,3},{0,0,0}};
+                path = {{2,0,0},{0,2,0},{5,4,3},{0,0,0}, {20,264,-15}, {100,264,17}};
             }
             void TearDown() {};
 
@@ -387,18 +387,6 @@ namespace csci3081 {
         dt = 1000;
         drone.Update(dt);
         EXPECT_FLOAT_EQ(drone.GetBattery()->GetBatteryReserve(), 0);
-
-        // Drone should not Update if battery is dead
-        dt = 1;
-        std::vector<float> prevPos = drone.GetPosition();
-        drone.Update(dt);
-        std::vector<float> newPos = drone.GetPosition();
-        EXPECT_FLOAT_EQ(drone.GetBattery()->GetBatteryReserve(), 0);
-        ASSERT_EQ(prevPos.size(), newPos.size());
-        for (int i = 0; i < newPos.size(); i++) {
-            EXPECT_FLOAT_EQ(prevPos.at(i), newPos.at(i));
-        }
-
         delete package;
     }
 
@@ -421,7 +409,7 @@ namespace csci3081 {
         system->AddEntity(droneEntity);
         system->AddEntity(packageEntity);
         system->AddEntity(customerEntity);
-        Drone* drone = dynamic_cast<Drone*>(droneEntity);
+        BatteryDroneDecorator* drone = dynamic_cast<BatteryDroneDecorator*>(droneEntity);
         drone->SetSpeed(30.0);
         Package* package = dynamic_cast<Package*>(packageEntity);
         float dt = 0.01;
@@ -455,7 +443,6 @@ namespace csci3081 {
        Z = std::to_string((int) package->GetPosition().at(2));
        std::string packagePosition = "[" + X + "," + Y + "," + Z +"]";
 
-
         // Check that the path passed to the notification contains the drone's starting position and package position
         std::size_t found5 = output1.find(packagePosition);
         contains = found5 != std::string::npos;
@@ -465,7 +452,6 @@ namespace csci3081 {
         contains = found6 != std::string::npos;
         EXPECT_TRUE(contains);
     
-
         // move drone to package (using default smart path)
         testing::internal::CaptureStdout();
         while(Vector3D(drone->GetPosition()).GetDistance(Vector3D(package->GetPosition())) > 1.0) {
@@ -497,7 +483,6 @@ namespace csci3081 {
         Y = std::to_string((int) package->GetDestination().GetY());
         Z = std::to_string((int) package->GetDestination().GetZ());
         std::string customerPosition = "[" + X + "," + Y + "," + Z +"]";
-        std::cout << customerPosition << std::endl;
         
         found6 = output1.find(customerPosition);
         contains = found6 != std::string::npos;
