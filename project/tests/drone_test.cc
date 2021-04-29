@@ -433,6 +433,7 @@ namespace csci3081 {
         contains = found4 != std::string::npos;
         EXPECT_TRUE(contains);
 
+    
        std::string X = std::to_string((int) package->GetPosition().at(0));
        std::string Y = std::to_string((int) package->GetPosition().at(1));
        std::string Z = std::to_string((int) package->GetPosition().at(2));
@@ -457,8 +458,12 @@ namespace csci3081 {
         while(Vector3D(drone->GetPosition()).GetDistance(Vector3D(package->GetPosition())) > 1.0) {
             system->Update(dt);
         }
-        // Check if observer is notified that package is en route
+        // Check if observer is notified of the drone's color details changing
         output1 = testing::internal::GetCapturedStdout();
+        std::size_t found10 = output1.find("\"details\":{\"color\":\"0x02bf17\"");
+        contains = found10 != std::string::npos;
+        EXPECT_TRUE(contains);
+        // Check if observer is notified that package is en route
         found = output1.find("en route");
         found2 = output1.find(std::to_string(package->GetId()));
         contains = found != std::string::npos;
