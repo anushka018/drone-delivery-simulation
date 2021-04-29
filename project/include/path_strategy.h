@@ -1,8 +1,9 @@
-#include <vector>
-#include <EntityProject/graph.h>
 
 #ifndef PATH_STRATEGY_H
 #define PATH_STRATEGY_H
+
+#include <vector>
+#include <EntityProject/graph.h>
 
 namespace csci3081 {
 

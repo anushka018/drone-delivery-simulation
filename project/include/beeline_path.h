@@ -1,7 +1,8 @@
-#include "path_strategy.h"
 
 #ifndef BEELINE_PATH_H
 #define BEELINE_PATH_H
+
+#include "path_strategy.h"
 
 namespace csci3081 {
 /**

@@ -2,12 +2,13 @@
  * @file package.h
  * @author Audrey Kelly
  */
-#include <string>
-#include "entity_base.h"
-#include "customer.h"
 
 #ifndef PACKAGE_H
 #define PACKAGE_H
+
+#include <string>
+#include "entity_base.h"
+#include "customer.h"
 
 namespace csci3081 {
 /**

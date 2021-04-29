@@ -2,6 +2,10 @@
  * @file drone.h
  * @author Audrey Kelly
  */
+
+#ifndef DRONE_H
+#define DRONE_H
+
 #include "entity_base.h"
 #include "package_carrier.h"
 #include <vector>
@@ -11,9 +15,6 @@
 #include "smart_path.h"
 #include "beeline_path.h"
 #include "parabolic_path.h"
-
-#ifndef DRONE_H
-#define DRONE_H
 
 namespace csci3081 {
 /**

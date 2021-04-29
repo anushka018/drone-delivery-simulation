@@ -2,15 +2,20 @@
  * @file package_carrier.h
  * @author Audrey Kelly
  */
-#include "entity_base.h"
-#include "path_strategy.h"
-#include <vector>
-#include <string>
-#include "battery.h"
-#include "package.h"
-
 #ifndef PACKAGE_CARRIER_H
 #define PACKAGE_CARRIER_H
+
+#include "entity_base.h"
+#include "path_strategy.h"
+#include "observer_helper.h"
+#include "battery.h"
+#include "package.h"
+#include <vector>
+#include <string>
+#include <iterator>
+#include <algorithm>
+#include <json_helper.h>
+
 
 namespace csci3081 {
 /**
@@ -21,6 +26,7 @@ namespace csci3081 {
  */
 class PackageCarrier : public EntityBase {
  public:
+  PackageCarrier();
    /**
     * @brief Construct a new Package Carrier entity
     * 
@@ -32,7 +38,6 @@ class PackageCarrier : public EntityBase {
     * @param[in] radius in meters (default is 1.0)
     * @param[in] batteryCapacity in seconds (default is 10000)
     */
-    PackageCarrier();
     PackageCarrier(std::vector<float> position, std::vector<float> direction,
             const picojson::object& details, const std::string name = "Default Package Carrier",
                 float speed = 0.0, float radius = 1.0, float batteryCapacity = 10000.0);
@@ -80,15 +85,6 @@ class PackageCarrier : public EntityBase {
      */
     virtual Battery* GetBattery();
     /**
-     * @brief Creates a picojson object of type notification, loads the correct values for that type of notification, 
-     * and converts the picojson object into a picojson value
-     * 
-     * @param[in] event: string for picojson object key "value"
-     * @param[in] path: optional parameter for drone/robot notifications
-     * @return picojson::value with loaded values for observer notification
-     */
-    virtual picojson::value CreateNotification(std::string event, const std::vector< std::vector<float> >& path = {});
-    /**
      * @brief Sets the direction of the package carrier to the given coordinate point
      * 
      * @details Overrides the SetDirection from the base class EntityBase. Takes in the new destination and checks
@@ -111,6 +107,7 @@ class PackageCarrier : public EntityBase {
     std::vector<Package*> packages;
     std::vector< std::vector<float> > path;
     PathStrategy* strategy;
+    ObserverHelper* observerHelper;
     int pathIndex;
     bool hasPackage;
     bool firstTimeDead = false;

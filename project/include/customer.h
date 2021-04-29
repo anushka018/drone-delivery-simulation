@@ -2,11 +2,12 @@
  * @file customer.h
  * @author Audrey Kelly
  */
-#include <string>
-#include "entity_base.h"
 
 #ifndef CUSTOMER_H
 #define CUSTOMER_H
+
+#include <string>
+#include "entity_base.h"
 
 namespace csci3081 {
 /**
