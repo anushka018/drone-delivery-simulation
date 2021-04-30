@@ -37,7 +37,6 @@ void PackageCarrier::Update(float dt) {
       //notify the observers that the package is on its way
       observerHelper->CreateNotification("en route", currentPackage);
       // notify the observers that the drone is now moving to the customer
-      std::cout << customerPath.size() << std::endl;
       observerHelper->CreateNotification("moving", customerPath);
     }
     battery->DecreaseCharge(dt);
