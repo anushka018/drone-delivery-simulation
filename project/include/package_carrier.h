@@ -2,14 +2,20 @@
  * @file package_carrier.h
  * @author Audrey Kelly
  */
-#include "entity_base.h"
-#include <vector>
-#include <string>
-#include "battery.h"
-#include "package.h"
-
 #ifndef PACKAGE_CARRIER_H
 #define PACKAGE_CARRIER_H
+
+#include "entity_base.h"
+#include "path_strategy.h"
+#include "observer_helper.h"
+#include "battery.h"
+#include "package.h"
+#include <vector>
+#include <string>
+#include <iterator>
+#include <algorithm>
+#include <json_helper.h>
+
 
 namespace csci3081 {
 /**
@@ -20,6 +26,7 @@ namespace csci3081 {
  */
 class PackageCarrier : public EntityBase {
  public:
+  PackageCarrier();
    /**
     * @brief Construct a new Package Carrier entity
     * 
@@ -29,70 +36,54 @@ class PackageCarrier : public EntityBase {
     * @param[in] name of Drone
     * @param[in] speed in meters per second (default is 0.0)
     * @param[in] radius in meters (default is 1.0)
+    * @param[in] batteryCapacity in seconds (default is 10000)
     */
     PackageCarrier(std::vector<float> position, std::vector<float> direction,
             const picojson::object& details, const std::string name = "Default Package Carrier",
-                float speed = 0.0, float radius = 1.0, float batteryCapacity = 10000.0); 
+                float speed = 0.0, float radius = 1.0, float batteryCapacity = 10000.0);
+                
     /**
      * @brief Moves the entity via Eulerian Integration with the given time interval dt
      * 
      * @param[in] dt time interval in seconds
      */
-    void Update(float dt) override;
+    virtual void Update(float dt) override;
     /**
      * @brief Get the route the package carrier is currently following for package delivery
      * 
      * @return a vector of (x,y,z) coordinate vectors that form a path avoiding buildings on the map
      */
-    std::vector< std::vector<float> > GetPath();
+    virtual std::vector< std::vector<float> > GetPath();
     /**
      * @brief Set the path for the carrier to follow for package delivery
      * 
      * @param[in] newPath: a list of vectors containing the float coordinate vectors of the path
      */
-    void SetPath(std::vector< std::vector<float> > newPath);
+    virtual void SetPath(const std::vector< std::vector<float> >& newPath);
+    /**
+     * @brief Create the path using the drone or robot's assigned path strategy
+     * 
+     * @param[in]: carrierPosition, the origin of the drone or robot before delivery
+     * @param[in]: packagePosition, the position of the package to be picked up
+     * @param[in]: customerPosition, the destination for the package
+     * @param[in]: graph, an optional IGraph* only used for the smart route strategy
+     * 
+     * @return std::vector< std::vector<float> >: a complete path for package carrier to follow from origin to package to customer
+     */
+    virtual std::vector< std::vector<float> > CreatePath(std::vector<float> carrierPosition, std::vector<float> packagePosition, 
+                                                        std::vector<float> customerPosition, const IGraph* graph = nullptr);
     /**
      * @brief Set the package pointer for the carrier
      * 
      * @param[in] package: the pointer to the package the drone is carrying
      */
-    void AssignPackage(Package* package);
+    virtual void AssignPackage(Package* package);
     /**
      * @brief Get the Battery of the carrier's engine
      * 
      * @return Battery* pointer to drone battery
      */
-    Battery* GetBattery();
-    /**
-     * @brief Creates a picojson object of type notification, loads the correct values for that type of notification, 
-     * and converts the picojson object into a picojson value
-     * 
-     * @param[in] event: string for picojson object key "value"
-     * @param[in] path: optional parameter for drone/robot notifications
-     * @return picojson::value with loaded values for observer notification
-     */
-    picojson::value CreateNotification(std::string event, const std::vector< std::vector<float> >& path = {});
-    /**
-     * @brief Destroy the carrier object and its dynamically allocated battery
-     * 
-     */
-    virtual ~PackageCarrier();
-
- private:
-    Battery* battery;
-    Package* currentPackage;
-    std::vector<Package*> packages;
-    std::vector< std::vector<float> > path;
-    int pathIndex;
-    bool hasPackage;
-    //json object for event 
-
-    /**
-     * @brief Pick up and move the package along with the carrier.  
-     * 
-     * @details Sets the position and direction of the package to the carrier's to match the movement. 
-     */
-    void CarryPackage();
+    virtual Battery* GetBattery();
     /**
      * @brief Sets the direction of the package carrier to the given coordinate point
      * 
@@ -104,6 +95,28 @@ class PackageCarrier : public EntityBase {
      * @param[in] destination vector with (x,y,z) float coordinates
      */
     void SetDirection(const std::vector<float>& dest) override;
+    /**
+     * @brief Destroy the carrier object and its dynamically allocated battery
+     * 
+     */
+    virtual ~PackageCarrier();
+
+ protected:
+    Battery* battery;
+    Package* currentPackage;
+    std::vector<Package*> packages;
+    std::vector< std::vector<float> > path;
+    PathStrategy* strategy;
+    ObserverHelper* observerHelper;
+    int pathIndex;
+    bool hasPackage;
+    bool firstTimeDead = false;
+    /**
+     * @brief Pick up and move the package along with the carrier.  
+     * 
+     * @details Sets the position and direction of the package to the carrier's to match the movement. 
+     */
+    void CarryPackage();
     /**
      * @brief Get the path from the previous package's destination to the next scheduled package
      * 

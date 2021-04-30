@@ -27,7 +27,7 @@ public:
      * 
      * @param[in] observer IEntityObserver*, the observer to be added
      */
-	void Attach(IEntityObserver* observer) {
+	virtual void Attach(IEntityObserver* observer) {
 		observers.push_back(observer);
 	}
 	/** 
@@ -35,17 +35,16 @@ public:
      * 
      * @param[in] observer IEntityObserver*, the observer to be removed from the entities vector
      */
-	void Detach(IEntityObserver* observer){
+	virtual void Detach(IEntityObserver* observer){
 		observers.erase(std::remove(observers.begin(), observers.end(), observer), observers.end());
 	}
-
 	/** 
      * @brief iterates through the observers vector calling the OnEvent method for each observer in the vector
      * 
      * @param[in] event const picojson::value&, the event value of the picojson object in the observers vector
      * @param[in] entity const IEntity&, the entity whose OnEvent method will be called (passed by reference)
      */
-	void Notify(const picojson::value& event, const IEntity& entity){
+	virtual void Notify(const picojson::value& event, const IEntity& entity){
 		for (IEntityObserver * concreteObserver : observers){
 			if (concreteObserver != NULL){
 				concreteObserver ->OnEvent(event, entity);

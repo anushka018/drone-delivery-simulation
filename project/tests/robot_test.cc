@@ -1,5 +1,8 @@
 #include "gtest/gtest.h"
 #include <EntityProject/project_settings.h>
+#include <EntityProject/osm_graph_parser.h>
+#include <EntityProject/entity_console_logger.h>
+#include <EntityProject/graph.h>
 #include "../include/delivery_simulation.h"
 #include <EntityProject/entity.h>
 #include "json_helper.h"
@@ -9,25 +12,38 @@ namespace csci3081 {
     class RobotTest : public ::testing::Test {
         public:
             void SetUp() {
+                system = dynamic_cast<IDeliverySystem*>(GetEntitySystem("default"));
+
                 position = {0,0,0};
                 direction = {1,0,0};
                 robotObj = JsonHelper::CreateJsonObject();
-                JsonHelper::AddStringToJsonObject(robotObj, "type", "Robot");
+                JsonHelper::AddStringToJsonObject(robotObj, "type", "robot");
+                JsonHelper::AddFloatToJsonObject(robotObj, "radius", 1.0);
                 JsonHelper::AddStdFloatVectorToJsonObject(robotObj, "position", position);
                 JsonHelper::AddStdFloatVectorToJsonObject(robotObj, "direction", direction);
 
                 packageObj = JsonHelper::CreateJsonObject();
                 JsonHelper::AddStringToJsonObject(packageObj, "type", "package");
-                JsonHelper::AddStdFloatVectorToJsonObject(packageObj, "position", position);
+                JsonHelper::AddFloatToJsonObject(packageObj, "radius", 1.0);
+                std::vector<float> packagePosition = {20,264,-15};
+                JsonHelper::AddStdFloatVectorToJsonObject(packageObj, "position", packagePosition);
                 JsonHelper::AddStdFloatVectorToJsonObject(packageObj, "direction", direction);
+
+                customerObj = JsonHelper::CreateJsonObject();
+                JsonHelper::AddStringToJsonObject(customerObj, "type", "customer");
+                std::vector<float> customerPosition = {100,264,17};
+                JsonHelper::AddStdFloatVectorToJsonObject(customerObj, "position", customerPosition);
+                JsonHelper::AddStdFloatVectorToJsonObject(customerObj, "direction", direction);
 
                 path = {{2,0,0},{0,2,0},{5,4,3},{0,0,0}};
             }
             void TearDown() {};
 
         protected:
+            IDeliverySystem* system;
             picojson::object robotObj;
             picojson::object packageObj;
+            picojson::object customerObj;
             std::vector<float> position;
             std::vector<float> direction;
             std::vector< std::vector<float> > path;
@@ -370,19 +386,127 @@ namespace csci3081 {
         dt = 1000;
         robot.Update(dt);
         EXPECT_FLOAT_EQ(robot.GetBattery()->GetBatteryReserve(), 0);
+        delete package;
+    }
 
-        // Robot should not Update if battery is dead
-        dt = 1;
-        std::vector<float> prevPos = robot.GetPosition();
-        robot.Update(dt);
-        std::vector<float> newPos = robot.GetPosition();
-        EXPECT_FLOAT_EQ(robot.GetBattery()->GetBatteryReserve(), 0);
-        ASSERT_EQ(prevPos.size(), newPos.size());
-        for (int i = 0; i < newPos.size(); i++) {
-            EXPECT_FLOAT_EQ(prevPos.at(i), newPos.at(i));
+    // Update Test Part 3: Check for the proper observer notifications during the simulation
+    TEST_F(RobotTest, UpdateObservers) {
+        // Create and set the graph
+        if (system) {
+            entity_project::OSMGraphParser parser;
+            const IGraph* graph = parser.CreateGraph("data/umn.osm", "data/umn-height.csv");
+            system->SetGraph(graph);
         }
 
-        delete package;
+        entity_project::EntityConsoleLogger logger;
+        system->AddObserver(&logger);
+        
+        IEntity* robotEntity = system->CreateEntity(robotObj);
+        IEntity* packageEntity = system->CreateEntity(packageObj);
+        IEntity* customerEntity = system->CreateEntity(customerObj);
+
+        system->AddEntity(robotEntity);
+        system->AddEntity(packageEntity);
+        system->AddEntity(customerEntity);
+        Robot* robot = dynamic_cast<Robot*>(robotEntity);
+        robot->SetSpeed(30.0);
+        Package* package = dynamic_cast<Package*>(packageEntity);
+        float dt = 0.01;
+
+        // Check if observer is notified that package is scheduled
+        testing::internal::CaptureStdout();
+        system->ScheduleDelivery(packageEntity, customerEntity);
+        std::string output1 = testing::internal::GetCapturedStdout();
+        std::size_t found = output1.find("scheduled");
+        std::size_t found2 = output1.find(std::to_string(package->GetId()));
+        bool contains = found != std::string::npos;
+        EXPECT_TRUE(contains);
+        contains = found2 != std::string::npos;
+        EXPECT_TRUE(contains);
+        // Check if observer is notified that Robot is moving
+        std::size_t found3 = output1.find("moving");
+        std::size_t found4 = output1.find(std::to_string(robot->GetId()));
+        contains = found3 != std::string::npos;
+        EXPECT_TRUE(contains);
+        contains = found4 != std::string::npos;
+        EXPECT_TRUE(contains);
+
+        std::string X = std::to_string((int) package->GetPosition().at(0));
+       std::string Y = std::to_string((int) package->GetPosition().at(1));
+       std::string Z = std::to_string((int) package->GetPosition().at(2));
+       std::string dronePosition = "[" + X + "," + Y + "," + Z +"]";
+
+       X = std::to_string((int) package->GetPosition().at(0));
+       Y = std::to_string((int) package->GetPosition().at(1));
+       Z = std::to_string((int) package->GetPosition().at(2));
+       std::string packagePosition = "[" + X + "," + Y + "," + Z +"]";
+
+
+        // Check that the path passed to the notification contains the robot's starting position and package position
+        std::size_t found5 = output1.find(packagePosition);
+        contains = found5 != std::string::npos;
+        EXPECT_TRUE(contains);
+        
+        std::size_t found6 = output1.find(dronePosition);
+        contains = found6 != std::string::npos;
+        EXPECT_TRUE(contains);
+
+        // move Robot to package (using default smart path)
+        testing::internal::CaptureStdout();
+        while(Vector3D(robot->GetPosition()).GetDistance(Vector3D(package->GetPosition())) > 1.0) {
+            system->Update(dt);
+        }
+        // Check if observer is notified that package is en route
+        output1 = testing::internal::GetCapturedStdout();
+        found = output1.find("en route");
+        found2 = output1.find(std::to_string(package->GetId()));
+        contains = found != std::string::npos;
+        EXPECT_TRUE(contains);
+        contains = found2 != std::string::npos;
+        EXPECT_TRUE(contains);
+        // Check if observer is notified that Robot is moving again to customer
+        found3 = output1.find("moving");
+        found4 = output1.find(std::to_string(robot->GetId()));
+        contains = found3 != std::string::npos;
+        EXPECT_TRUE(contains);
+        contains = found4 != std::string::npos;
+        EXPECT_TRUE(contains);
+        // Check that path contains starting position of robot at the package pick-up spot
+        found5 = output1.find(packagePosition);
+        contains = found5 != std::string::npos;
+        EXPECT_TRUE(contains);
+
+        // Check if path contains the final position of the customer
+        X = std::to_string((int) package->GetDestination().GetX());
+        Y = std::to_string((int) package->GetDestination().GetY());
+        Z = std::to_string((int) package->GetDestination().GetZ());
+        std::string customerPosition = "[" + X + "," + Y + "," + Z +"]";
+        
+        found6 = output1.find(customerPosition);
+        contains = found6 != std::string::npos;
+        EXPECT_TRUE(contains);
+
+        testing::internal::CaptureStdout();
+        // Robot moves package to customer
+        while(Vector3D(robot->GetPosition()).GetDistance(Vector3D(package->GetDestination())) > 1.0) {
+            system->Update(dt);
+        }
+        system->Update(dt);
+        // Check if observer is notified that package is delivered
+        output1 = testing::internal::GetCapturedStdout();
+        found = output1.find("delivered");
+        found2 = output1.find(std::to_string(package->GetId()));
+        contains = found != std::string::npos;
+        EXPECT_TRUE(contains);
+        contains = found2 != std::string::npos;
+        EXPECT_TRUE(contains);
+        // Check if observer is notified that Robot is no longer moving
+        found3 = output1.find("idle");
+        found4 = output1.find(std::to_string(robot->GetId()));
+        contains = found3 != std::string::npos;
+        EXPECT_TRUE(contains);
+        contains = found4 != std::string::npos;
+        EXPECT_TRUE(contains);     
     }
 
    
