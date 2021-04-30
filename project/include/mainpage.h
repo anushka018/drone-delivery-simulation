@@ -324,6 +324,15 @@
 * return new BatteryDroneDecorator(drone);
 * 
 * 
+* Advantages of the Decorator Pattern vs. Other Design Choices
+*
+*
+* An initial option which was considered and could have been implemented in lieu of the decorator pattern is simply modifying the drone color within the package carrier class in the branch where the battery life was decreased by dt. This approach seems simpler and would prevent the creation of any new classes or modification to the inheritance structure. However, it is not the best design option because it doesn't adhere to good code design principles. For example, adding this functionality directly into the package carrier class would violate the single responsibility principle and would not allow our code to be extensibile. For this reason, we determined that implementing the decorator pattern would be a much better approach. 
+*
+*
+* The decorator pattern is advantageous because its inertance structure allows for greater flexibility then traditional static inheritance. This means that it would be fairly easy to implement other drone decorators. For example, decorators for the drone based on its weight, distance to the package, etc. It also keeps all classes closed to modification and open to extensibility because, in order to implement a new feature, we would not have to modify the drone decorator base class or refactor any of our existing code. All that we would need to do is to add a new concrete drone decorator class for the new feature that we are implementing. The decorator pattern also allows us to forgo the need to code all the functionality into the drone object directly. This is good code design because it adheres to the single responsibility principles which would otherwise be broken by our package carrier class for drones and robots. Finally, it also simplifies the creation of our code and other additional features in the future if we were to add them. 
+* 
+* 
 * Difficulties & Tips/Advice 
 * 
 * 
