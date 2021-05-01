@@ -4,7 +4,6 @@
  */
 #ifndef VECTOR_3D_H
 #define VECTOR_3D_H
-
 #include <iostream>
 #include <iomanip>
 #include <vector>

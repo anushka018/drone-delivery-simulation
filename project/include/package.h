@@ -2,12 +2,13 @@
  * @file package.h
  * @author Audrey Kelly
  */
-#include <string>
-#include "entity_base.h"
-#include "customer.h"
 
 #ifndef PACKAGE_H
 #define PACKAGE_H
+
+#include <string>
+#include "entity_base.h"
+#include "customer.h"
 
 namespace csci3081 {
 /**
@@ -59,11 +60,25 @@ class Package : public EntityBase {
      * @param[in] dest Vector3D object representing coordinates of package's destination
      */
     void SetDestination(Vector3D dest);
+   /**
+    * @brief Set the isDropped attribute of the package to true or false
+    * 
+    * @param[in] isDropped_, a boolean value 
+    */
+    void SetIsDropped(bool isDropped_);
+   /**
+    * @brief Get the boolean value of the isDropped attribute
+    * 
+    * @return true if the package has been dropped and needs to be rescheduled
+    * @return false if package is still being carried for delivery
+    */
+    bool GetIsDropped();
 
  private:
     Vector3D destination;
     Customer* recipient;
     float weight_;
+    bool isDropped; 
 };
 
 }   // namespace csci3081

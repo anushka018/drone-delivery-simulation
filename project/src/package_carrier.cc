@@ -3,37 +3,30 @@
  * @author Audrey Kelly
  */
 #include "package_carrier.h"
-#include <iterator>
-#include <algorithm>
-#include <json_helper.h>
 
 namespace csci3081 {
+PackageCarrier::PackageCarrier() {};
 
 PackageCarrier::PackageCarrier(std::vector<float> position, std::vector<float> direction, 
                           const picojson::object& details, const std::string name, float speed, float radius, float batteryCapacity) : 
                           EntityBase(details, position, direction, name, speed, radius) {
-                                
   battery = new Battery(batteryCapacity);
   pathIndex = 0;
   hasPackage = false;
   currentPackage = nullptr;
+  packages = {};
   path = {};
+  observerHelper = nullptr;
 }
 
-
 void PackageCarrier::Update(float dt) {
-  // find segment of path from package to customer
-  std::vector< std::vector<float> >::iterator start = std::find(path.begin(), path.end(), currentPackage->GetPosition());
-  std::vector< std::vector<float> >::iterator end = std::find(start, path.end(), (currentPackage->GetDestination()).GetVector());
-  int size = std::distance(start, end);
-  std::vector< std::vector<float> > customerPath(size);
-  std::copy(start, end, customerPath.begin());
-  
+  std::vector< std::vector<float> > customerPath;
   // PackageCarrier cannot move without battery power
   if (!(battery->IsDead())) {
     SetDirection(path[pathIndex]);
     position_ += Vector3D((direction_ * speed_) * dt);
     posVector = position_.GetVector();
+    observerHelper->FindPathToCustomer(customerPath, packages);
     // If PackageCarrier is carrying package or is within package's radius, it updates the package's position to match its own
     if (hasPackage) {
       CarryPackage();
@@ -42,25 +35,28 @@ void PackageCarrier::Update(float dt) {
       hasPackage = true;
       CarryPackage();
       //notify the observers that the package is on its way
-      picojson::value eventVal = CreateNotification("en route");
-      Notify(eventVal, *currentPackage);
+      observerHelper->CreateNotification("en route", currentPackage);
       // notify the observers that the drone is now moving to the customer
-      eventVal = CreateNotification("moving", customerPath);
-      Notify(eventVal, *this);
+      observerHelper->CreateNotification("moving", customerPath);
     }
     battery->DecreaseCharge(dt);
   }
+  if (!firstTimeDead && battery->IsDead()) {
+      for (Package* package : packages) {
+        package->SetIsDropped(true);
+      }
+      // Notify observers that drone/robot has stopped moving
+      observerHelper->CreateNotification("idle");
+      //change the height of the package so it drops
+      if (hasPackage) {
+        std::vector<float> packagePos = currentPackage->GetPosition();
+        currentPackage->SetPosition({packagePos.at(0), 250, packagePos.at(2)});
+      }
+      packages.erase(packages.begin());
+      firstTimeDead = true; 
+  }
 }
-
-void PackageCarrier::GetNextPackagePath(std::vector< std::vector<float> >& packagePath) {
-  // Get path from last package's destination to next package
-  std::vector< std::vector<float> >::iterator start = std::find(path.begin(), path.end(), (currentPackage->GetDestination()).GetVector());
-  std::vector< std::vector<float> >::iterator end = std::find(start, path.end(), packages.at(1)->GetPosition());
-  int size = std::distance(start, end);
-  packagePath.resize(size);
-  std::copy(start, end, packagePath.begin());
-}
-
+ 
 void PackageCarrier::CarryPackage() {
     currentPackage->SetSpeed(speed_);
     currentPackage->SetPosition(posVector);
@@ -70,29 +66,24 @@ void PackageCarrier::CarryPackage() {
       currentPackage->SetPosition({0,-500,0});
       hasPackage = false;
       // Notify observers that package has been delivered
-      picojson::value eventVal = CreateNotification("delivered");
-      Notify(eventVal, *currentPackage);
+      observerHelper->CreateNotification("delivered", currentPackage);
       // Continue to next package to deliver if there are more scheduled
       if (packages.size() > 1) {
-        std::vector< std::vector<float> > packagePath;
-        GetNextPackagePath(packagePath);
         // Remove package from list of scheduled deliveries
+        std::vector< std::vector<float> > packagePath;
+        observerHelper->GetNextPackagePath(packagePath, packages);
         packages.erase(packages.begin());
         currentPackage = packages.at(0);
-        std::cout << "Path size: " << packagePath.size() << std::endl;
         // notify observers that package carrier is moving toward package
-        eventVal = CreateNotification("moving", packagePath);
-        Notify(eventVal, *this);
-        currentPackage = packages.at(0);
+        std::cout << packagePath.size() << std::endl;
+        observerHelper->CreateNotification("moving", packagePath);
       }
       else {
         // Notify observers that drone has stopped moving
-      eventVal = CreateNotification("idle");
-      Notify(eventVal, *this);
+        observerHelper->CreateNotification("idle");
       }
     }  
 }
-
 void PackageCarrier::SetDirection(const std::vector<float>& dest) {
     Vector3D convertDest = Vector3D(dest);
     // If the PackageCarrier's radius is within a 1.0 meter radius of their current destination, they have reached that point
@@ -113,46 +104,40 @@ void PackageCarrier::AssignPackage(Package* package) {
   isDynamic = true;
   packages.push_back(package);
   currentPackage = packages.at(0);
+  if(!observerHelper) {
+    observerHelper = new ObserverHelper(path, dynamic_cast<EntityBase*>(this));
+  }
   // notify the observers that the package has been scheduled
-  picojson::value eventVal = CreateNotification("scheduled");
-  Notify(eventVal, *package);
+  observerHelper->CreateNotification("scheduled", package);
   if (packages.size() == 1) {
-    // find segment of path from carrier origin to package
-  std::vector< std::vector<float> >::iterator end = std::find(path.begin(), path.end(), currentPackage->GetPosition());
-  int size = std::distance(path.begin(), end);
-  std::vector< std::vector<float> > packagePath(size);
-  std::copy(path.begin(), end, packagePath.begin());
-  // notify observers that package carrier is moving toward package
-  eventVal = CreateNotification("moving", packagePath);
-  Notify(eventVal, *this);
-  }
+    std::vector< std::vector<float> > packagePath;
+    observerHelper->FindPathToPackage(packagePath, packages);
+    // notify observers that package carrier is moving toward package
+    observerHelper->CreateNotification("moving", packagePath);
+  } 
 }
-
-picojson::value PackageCarrier::CreateNotification(std::string event, const std::vector< std::vector<float> >& path) {
-  picojson::object eventObj = JsonHelper::CreateJsonNotification();
-  JsonHelper::AddStringToJsonObject(eventObj, "value", event);
-  picojson::value eventVal = JsonHelper::ConvertPicojsonObjectToValue(eventObj);
-  if (path.size() > 0) {
-    JsonHelper::AddStdVectorVectorFloatToJsonObject(eventObj, "path", path);
-  }
-  return JsonHelper::ConvertPicojsonObjectToValue(eventObj);
-}
-
+ 
 std::vector< std::vector<float> > PackageCarrier::GetPath() {
   return path;
 }
 
-void PackageCarrier::SetPath(const std::vector< std::vector<float> > newPath) {
+void PackageCarrier::SetPath(const std::vector< std::vector<float> >& newPath) {
   path = newPath;
 }
 
+std::vector< std::vector<float> > PackageCarrier::CreatePath(std::vector<float> carrierPosition, std::vector<float> packagePosition, 
+                                                        std::vector<float> customerPosition, const IGraph* graph) {
+  return strategy->CreatePath(carrierPosition, packagePosition, customerPosition, graph);
+}
+ 
 Battery* PackageCarrier::GetBattery() {
   return battery;
-
 }
 
 PackageCarrier::~PackageCarrier() {
   delete battery;
+  delete strategy;
+  delete observerHelper;
 }
-
+ 
 }   // namespace csci3081

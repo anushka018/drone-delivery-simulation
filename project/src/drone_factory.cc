@@ -3,8 +3,9 @@
  * @author Audrey Kelly
  */
 #include "drone_factory.h"
+#include "picojson.h"
 
-namespace csci3081 {
+namespace csci3081 { 
     DroneFactory::DroneFactory() {};
 
     IEntity* DroneFactory::CreateEntity(const picojson::object& val) {
@@ -23,7 +24,7 @@ namespace csci3081 {
             if (contains) {
                 radius = (float) JsonHelper::GetDouble(val, "radius"); 
             }
-            float speed = 0.0; 
+            float speed = 30.0; 
             contains = JsonHelper::ContainsKey(val, "speed");
             if (contains) {
                 speed = (float) JsonHelper::GetDouble(val, "speed");
@@ -33,7 +34,15 @@ namespace csci3081 {
             if (contains) {
                 batteryCapacity = (float) JsonHelper::GetDouble(val, "battery_capacity");
             }
-            return new Drone(position, direction, val, name, speed, radius, batteryCapacity);
+            contains = JsonHelper::ContainsKey(val, "path");
+            std::string pathType = "";
+            if (contains) {
+                pathType = JsonHelper::GetString(val, "path");
+            }
+            picojson::object& modified = const_cast<picojson::object&>(val);
+            // JsonHelper::AddStringToJsonObject(modified, "color","0x02bf17");
+            PackageCarrier* drone = new Drone(position, direction, modified, name, speed, radius, batteryCapacity, pathType);
+            return new BatteryDroneDecorator(drone);
         }
         return nullptr;
     }

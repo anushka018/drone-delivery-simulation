@@ -39,6 +39,7 @@ class EntityBase : public IEntity, public ASubject {
     * @param[in] speed in meters per second
     * @param[in] radius in meters
      */
+    EntityBase();
     EntityBase(const picojson::object& obj, std::vector<float> pos, std::vector<float> direction, 
                                             std::string name, float speed = 0.0, float radius = 1.0);
     /**

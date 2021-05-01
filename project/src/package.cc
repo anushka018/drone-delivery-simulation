@@ -14,6 +14,7 @@ namespace csci3081 {
   weight_ = weight;
   destination = Vector3D(); // Initialized to origin of graph until delivery is scheduled
   recipient = nullptr;
+  isDropped = false;
 }
     float Package::GetWeight() {
         return weight_;
@@ -36,4 +37,11 @@ namespace csci3081 {
         destination = dest;
     }
 
+    void Package::SetIsDropped(bool isDropped_) { 
+        isDropped = isDropped_;
+    }
+    
+    bool Package::GetIsDropped(){
+        return isDropped;
+    }
 }   // namespace csci3081
